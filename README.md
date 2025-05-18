@@ -21,6 +21,9 @@ Sistema de ponto eletrônico simples desenvolvido em HTML, Tailwind CSS e JavaSc
 - Interface responsiva e com design moderno usando Tailwind CSS
 
 ---
+![image](https://github.com/user-attachments/assets/7f04ad87-d76b-4c61-8ff6-5c2df50f8171)
+![image](https://github.com/user-attachments/assets/81cca01d-96ae-4499-924e-71b6f0dbcf71)
+
 
 ## Tecnologias Utilizadas
 
