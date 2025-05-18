@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ponto Eletrônico | Controle de Horas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              200: '#ddd6fe',
+              300: '#c4b5fd',
+              400: '#a78bfa',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+              800: '#5b21b6',
+              900: '#4c1d95',
+            },
+            success: '#10b981',
+            warning: '#f59e0b',
+            danger: '#ef4444',
+            dark: '#1e293b',
+            light: '#f8fafc'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          boxShadow: {
+            'soft': '0 4px 20px -2px rgba(139, 92, 246, 0.15)',
+            'soft-lg': '0 10px 30px -3px rgba(139, 92, 246, 0.2)'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+    }
+    .card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid rgba(203, 213, 225, 0.3);
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px -3px rgba(139, 92, 246, 0.2);
+    }
+    .pulse-animation {
+      animation: pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 4px 20px -2px rgba(139, 92, 246, 0.15); }
+      50% { transform: scale(1.02); box-shadow: 0 10px 30px -3px rgba(139, 92, 246, 0.25); }
+    }
+    .smooth-transition {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 10px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: #c4b5fd;
+      border-radius: 10px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+      background: #a78bfa;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 antialiased">
+  <div class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+      <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-lg bg-primary-600 flex items-center justify-center">
+            <i class="fas fa-fingerprint text-white text-lg"></i>
+          </div>
+          <h1 class="text-xl font-bold text-gray-800">Ponto<span class="text-primary-600">Pro</span></h1>
+        </div>
+        <div id="userSection" class="hidden">
+          <div class="flex items-center space-x-4">
+            <div class="text-right hidden sm:block">
+              <span id="userName" class="font-medium text-gray-700 block"></span>
+              <span id="userRole" class="text-xs text-gray-500 block"></span>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white shadow-sm">
+              <i class="fas fa-user"></i>
+            </div>
+            <button id="logoutBtn" class="text-gray-500 hover:text-primary-600 smooth-transition">
+              <i class="fas fa-sign-out-alt"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 container mx-auto px-4 py-8">
+      <!-- Login Section -->
+      <section id="loginSection" class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-8">
+        <div class="text-center mb-6">
+          <div class="w-16 h-16 rounded-full bg-primary-50 flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-fingerprint text-primary-600 text-2xl"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-800">Bem-vindo de volta</h2>
+          <p class="text-gray-500 mt-1">Faça login para registrar seu ponto</p>
+        </div>
+        <form id="loginForm" class="space-y-5">
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-envelope text-gray-400"></i>
+              </div>
+              <input type="email" id="email" required
+                     class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 smooth-transition"
+                     placeholder="seu@email.com">
+            </div>
+          </div>
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-lock text-gray-400"></i>
+              </div>
+              <input type="password" id="password" required
+                     class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 smooth-transition"
+                     placeholder="••••••••">
+            </div>
+          </div>
+          <button type="submit"
+                  class="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white py-2.5 px-4 rounded-lg font-semibold shadow-sm smooth-transition flex items-center justify-center">
+            <i class="fas fa-sign-in-alt mr-2"></i> Entrar
+          </button>
+        </form>
+      </section>
+
+      <!-- Dashboard Section (hidden initially) -->
+      <section id="dashboardSection" class="hidden">
+        <div class="max-w-2xl mx-auto space-y-6">
+          <!-- Greeting Card -->
+          <div class="bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-lg text-white p-6">
+            <div class="flex justify-between items-start">
+              <div>
+                <h2 class="text-xl font-bold" id="greetingText">Bom dia,</h2>
+                <p class="opacity-90 mt-1" id="currentDateTime">Carregando data e hora...</p>
+              </div>
+              <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                <i class="fas fa-clock text-xl"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Day Card -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden p-6 card pulse-animation">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+              <i class="fas fa-calendar-day text-primary-600 mr-2"></i> Registro do Dia
+            </h2>
+            <div class="flex justify-between items-center mb-4">
+              <span class="font-medium text-gray-600">Data:</span>
+              <span id="currentDate" class="font-semibold text-gray-700"></span>
+            </div>
+            
+            <div class="space-y-3 mb-6">
+              <div class="flex justify-between items-center py-2 px-3 rounded-lg bg-gray-50">
+                <span class="text-gray-600 flex items-center">
+                  <i class="fas fa-sign-in-alt text-primary-500 mr-2"></i>Entrada:
+                </span>
+                <span id="entryTime" class="font-medium text-gray-700">--:--</span>
+              </div>
+              <div class="flex justify-between items-center py-2 px-3 rounded-lg bg-gray-50">
+                <span class="text-gray-600 flex items-center">
+                  <i class="fas fa-utensils text-primary-500 mr-2"></i>Almoço (início):
+                </span>
+                <span id="lunchStartTime" class="font-medium text-gray-700">--:--</span>
+              </div>
+              <div class="flex justify-between items-center py-2 px-3 rounded-lg bg-gray-50">
+                <span class="text-gray-600 flex items-center">
+                  <i class="fas fa-utensils text-primary-500 mr-2"></i>Almoço (fim):
+                </span>
+                <span id="lunchEndTime" class="font-medium text-gray-700">--:--</span>
+              </div>
+              <div class="flex justify-between items-center py-2 px-3 rounded-lg bg-gray-50">
+                <span class="text-gray-600 flex items-center">
+                  <i class="fas fa-sign-out-alt text-primary-500 mr-2"></i>Saída:
+                </span>
+                <span id="exitTime" class="font-medium text-gray-700">--:--</span>
+              </div>
+            </div>
+            
+            <button id="registerBtn"
+                    class="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white py-3 px-4 rounded-lg font-semibold shadow-md smooth-transition text-lg flex items-center justify-center">
+              <i class="fas fa-fingerprint mr-2"></i>
+              <span id="registerBtnText">Bater Entrada</span>
+            </button>
+          </div>
+
+          <!-- Time Summary -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden p-6 card">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+              <i class="fas fa-chart-pie text-primary-600 mr-2"></i> Resumo do Dia
+            </h2>
+            <div class="grid grid-cols-3 gap-4 text-center">
+              <div class="bg-primary-50 p-4 rounded-lg border border-primary-100">
+                <div class="text-primary-600 font-bold text-2xl" id="workedHours">0h</div>
+                <div class="text-xs text-gray-500 mt-1">Horas trabalhadas</div>
+              </div>
+              <div class="bg-green-50 p-4 rounded-lg border border-green-100">
+                <div class="text-success font-bold text-2xl" id="lunchDuration">0h</div>
+                <div class="text-xs text-gray-500 mt-1">Intervalo</div>
+              </div>
+              <div class="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                <div class="text-warning font-bold text-2xl" id="remainingHours">8h</div>
+                <div class="text-xs text-gray-500 mt-1">Restantes</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Records -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden p-6 card">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-bold text-gray-800 flex items-center">
+                <i class="fas fa-history text-primary-600 mr-2"></i> Seus Registros
+              </h2>
+              <button id="refreshBtn" class="text-primary-500 hover:text-primary-700 smooth-transition bg-primary-50 hover:bg-primary-100 p-2 rounded-lg">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+            
+            <div class="space-y-3 max-h-64 overflow-y-auto pr-2 scrollbar-thin" id="recordsList">
+              <!-- Records will be added here dynamically -->
+              <div class="text-center text-gray-500 py-4">
+                <i class="fas fa-spinner fa-spin mr-2"></i> Carregando registros...
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-100 py-4">
+      <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
+        <p>© 2023 PontoPro - Sistema de Controle de Ponto Eletrônico</p>
+      </div>
+    </footer>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-4 right-4 px-5 py-3 rounded-lg shadow-lg transform translate-y-10 opacity-0 transition-all duration-300 hidden flex items-start max-w-xs z-50">
+      <div class="mr-3 text-lg" id="toastIcon">
+        <i class="fas fa-info-circle"></i>
+      </div>
+      <div>
+        <div id="toastTitle" class="font-semibold"></div>
+        <div id="toastMessage" class="text-sm"></div>
+      </div>
+      <button id="toastClose" class="ml-4 text-gray-400 hover:text-gray-500">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
