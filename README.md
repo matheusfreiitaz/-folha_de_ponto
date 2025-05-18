@@ -23,6 +23,8 @@ Sistema de ponto eletrônico simples desenvolvido em HTML, Tailwind CSS e JavaSc
 ---
 ![image](https://github.com/user-attachments/assets/7f04ad87-d76b-4c61-8ff6-5c2df50f8171)
 ![image](https://github.com/user-attachments/assets/81cca01d-96ae-4499-924e-71b6f0dbcf71)
+Login do Usuario
+![image](https://github.com/user-attachments/assets/577d85c8-5356-4e12-b285-8ba1183b0684)
 
 
 ## Tecnologias Utilizadas
