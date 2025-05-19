@@ -1,1 +1,3444 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PontoPlus | Sistema de Gestão de Ponto</title>
+    
+    <!-- Fontes e Ícones -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bibliotecas CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/main.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css">
+    
+    <style>
+        :root {
+            --primary: #7c4dff;
+            --primary-light: #b47cff;
+            --primary-dark: #3f1dcb;
+            --secondary: #00e5ff;
+            --accent: #ff4081;
+            --text: #2d3748;
+            --text-light: #718096;
+            --background: #f8fafc;
+            --card: #ffffff;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --error: #f44336;
+            --gray-100: #f7fafc;
+            --gray-200: #edf2f7;
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Layout Principal */
+        .app-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary-dark), var(--primary));
+            color: white;
+            padding: 2rem 1.5rem;
+            position: relative;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 3rem;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+        }
+
+        .nav-item i {
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .user-profile {
+            position: absolute;
+            bottom: 2rem;
+            left: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-dark);
+            font-weight: bold;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        /* Botões */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        /* Formulários */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(124, 77, 255, 0.1);
+        }
+
+        /* Tabelas */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th, .table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .table th {
+            font-weight: 600;
+            color: var(--text-light);
+            background-color: var(--gray-100);
+        }
+
+        .table tr:hover {
+            background-color: var(--gray-100);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-primary {
+            background-color: rgba(124, 77, 255, 0.1);
+            color: var(--primary);
+        }
+
+        .badge-success {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background-color: rgba(255, 152, 0, 0.1);
+            color: var(--warning);
+        }
+
+        .badge-error {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--error);
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+        }
+
+        /* Custom FullCalendar */
+        .fc .fc-toolbar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .fc .fc-button {
+            background-color: var(--primary);
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+        }
+
+        .fc .fc-button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Custom Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Video Element for Face Recognition */
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .video-container video {
+            width: 100%;
+            display: block;
+        }
+
+        .face-recognition-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-weight: 500;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #edf2f7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #edf2f7;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast {
+            padding: 16px;
+            border-radius: 8px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast-success {
+            background-color: var(--success);
+        }
+
+        .toast-error {
+            background-color: var(--error);
+        }
+
+        .toast-warning {
+            background-color: var(--warning);
+        }
+
+        .toast-info {
+            background-color: var(--primary);
+        }
+
+        /* Grid Layout */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Status Cards */
+        .status-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 1.25rem;
+            border-radius: 12px;
+            background-color: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .status-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .status-icon.primary {
+            background-color: rgba(124, 77, 255, 0.1);
+            color: var(--primary);
+        }
+
+        .status-icon.success {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+        }
+
+        .status-icon.warning {
+            background-color: rgba(255, 152, 0, 0.1);
+            color: var(--warning);
+        }
+
+        .status-icon.error {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--error);
+        }
+
+        .status-info {
+            flex: 1;
+        }
+
+        .status-title {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        .status-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #e2e8f0;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -30px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            border: 4px solid white;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        .timeline-content {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .timeline-date {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .timeline-desc {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* Gesture Recognition */
+        .gesture-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .gesture-container video {
+            width: 100%;
+            display: block;
+        }
+
+        .gesture-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-weight: 500;
+        }
+
+        .gesture-instruction {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .gesture-feedback {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Dropzone */
+        .dropzone {
+            border: 2px dashed #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dropzone:hover {
+            border-color: var(--primary);
+            background-color: rgba(124, 77, 255, 0.05);
+        }
+
+        .dropzone .dz-message {
+            margin: 2em 0;
+            color: var(--text-light);
+        }
+
+        .dropzone .dz-preview {
+            margin: 10px;
+        }
+
+        /* Employee Registration */
+        .employee-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            margin: 0 auto 20px;
+            display: block;
+            cursor: pointer;
+        }
+
+        /* Invalid Records */
+        .invalid-reason {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        /* Mirror View */
+        .mirror-view {
+            background-color: #f5f7fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .mirror-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .mirror-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Gesture Animation */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .gesture-pulse {
+            animation: pulse 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-fingerprint"></i>
+                </div>
+                <div class="logo-text">PontoPlus</div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-section="registrar">
+                    <i class="fas fa-clock"></i>
+                    <span>Registrar Ponto</span>
+                </a>
+                <a href="#" class="nav-item" data-section="calendario">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Calendário</span>
+                </a>
+                <a href="#" class="nav-item" data-section="ferias">
+                    <i class="fas fa-umbrella-beach"></i>
+                    <span>Férias</span>
+                </a>
+                <a href="#" class="nav-item" data-section="relatorios">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Relatórios</span>
+                </a>
+                <a href="#" class="nav-item admin-only" data-section="admin" style="display: none;">
+                    <i class="fas fa-cog"></i>
+                    <span>Administração</span>
+                </a>
+                <a href="#" class="nav-item" data-section="equipe">
+                    <i class="fas fa-users"></i>
+                    <span>Minha Equipe</span>
+                </a>
+                <a href="#" class="nav-item admin-only" data-section="colaboradores" style="display: none;">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Cadastrar Colaborador</span>
+                </a>
+                <a href="#" class="nav-item admin-only" data-section="invalidar" style="display: none;">
+                    <i class="fas fa-ban"></i>
+                    <span>Invalidar Registros</span>
+                </a>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="user-avatar">JD</div>
+                <div class="user-info">
+                    <div class="user-name">John Doe</div>
+                    <div class="user-role">Administrador</div>
+                </div>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h1 class="page-title">Dashboard</h1>
+                <div class="header-actions">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="section-content fade-in">
+                <div class="grid-3">
+                    <div class="status-card">
+                        <div class="status-icon primary">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="status-info">
+                            <div class="status-title">Horas Trabalhadas</div>
+                            <div class="status-value">168.5h</div>
+                        </div>
+                    </div>
+                    
+                    <div class="status-card">
+                        <div class="status-icon success">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <div class="status-info">
+                            <div class="status-title">Banco de Horas</div>
+                            <div class="status-value">+12.5h</div>
+                        </div>
+                    </div>
+                    
+                    <div class="status-card">
+                        <div class="status-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="status-info">
+                            <div class="status-title">Pendências</div>
+                            <div class="status-value">3</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Últimos Registros</h3>
+                            <a href="#" class="text-sm text-primary">Ver todos</a>
+                        </div>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-date">Hoje, 08:15</div>
+                                    <h4 class="timeline-title">Entrada registrada</h4>
+                                    <p class="timeline-desc">Localização: Rua Principal, 123</p>
+                                    <p class="invalid-reason" style="display: none;">Motivo da invalidação</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-date">Ontem, 18:30</div>
+                                    <h4 class="timeline-title">Saída registrada</h4>
+                                    <p class="timeline-desc">Localização: Rua Principal, 123</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-date">Ontem, 12:00</div>
+                                    <h4 class="timeline-title">Intervalo registrado</h4>
+                                    <p class="timeline-desc">Duração: 1h 15min</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Próximos Eventos</h3>
+                            <a href="#" class="text-sm text-primary">Ver calendário</a>
+                        </div>
+                        <div id="mini-calendar"></div>
+                    </div>
+                </div>
+
+                <!-- Espelho de Ponto -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Espelho de Ponto</h3>
+                        <div>
+                            <button class="btn btn-outline btn-sm" id="refresh-mirror">
+                                <i class="fas fa-sync-alt"></i> Atualizar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mirror-view" id="mirror-view">
+                        <div class="mirror-item">
+                            <span>Hoje</span>
+                            <span>08:15 - Entrada</span>
+                        </div>
+                        <div class="mirror-item">
+                            <span>Ontem</span>
+                            <span>18:30 - Saída</span>
+                        </div>
+                        <div class="mirror-item">
+                            <span>Ontem</span>
+                            <span>12:00 - Intervalo</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Registrar Ponto Section -->
+            <section id="registrar-section" class="section-content" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Registrar Ponto</h3>
+                    </div>
+                    <div class="grid-2">
+                        <div>
+                            <h4 class="text-lg font-semibold mb-4">Método Tradicional</h4>
+                            <div class="form-group">
+                                <label class="form-label">Tipo de Registro</label>
+                                <select class="form-control" id="tipo-registro">
+                                    <option value="entrada">Entrada</option>
+                                    <option value="saida">Saída</option>
+                                    <option value="intervalo">Intervalo</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Localização</label>
+                                <div id="location-info" class="text-sm text-primary mb-2">
+                                    <i class="fas fa-sync-alt fa-spin"></i> Obtendo localização...
+                                </div>
+                            </div>
+                            <button id="registrar-ponto-btn" class="btn btn-primary" disabled>
+                                <i class="fas fa-check-circle"></i> Registrar Ponto
+                            </button>
+                            <div id="registro-status" class="mt-4"></div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-lg font-semibold mb-4">Reconhecimento por Gestos</h4>
+                            <div class="gesture-container">
+                                <video id="gestureVideo" autoplay playsinline></video>
+                                <div id="gesture-overlay" class="gesture-overlay" style="display: none;">
+                                    <div class="spinner"></div>
+                                    <p class="mt-3">Analisando gesto...</p>
+                                </div>
+                                <div id="gesture-instruction" class="gesture-instruction">
+                                    <i class="fas fa-hand-point-up"></i> Faça um gesto com a mão para registrar
+                                </div>
+                                <div id="gesture-feedback" class="gesture-feedback"></div>
+                            </div>
+                            <button id="start-gesture-recognition" class="btn btn-secondary mt-4">
+                                <i class="fas fa-hand-paper"></i> Iniciar Reconhecimento
+                            </button>
+                            <div id="gesture-recognition-status" class="mt-2 text-sm"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Anexar Atestado -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Anexar Documento</h3>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Selecione o registro relacionado</label>
+                        <select class="form-control" id="documento-registro">
+                            <option value="">Selecione um registro</option>
+                            <option value="1">Entrada - Hoje, 08:15</option>
+                            <option value="2">Saída - Ontem, 18:30</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Documento</label>
+                        <select class="form-control" id="documento-tipo">
+                            <option value="atestado">Atestado Médico</option>
+                            <option value="comprovante">Comprovante</option>
+                            <option value="outro">Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Anexar Arquivo</label>
+                        <div id="document-dropzone" class="dropzone">
+                            <div class="dz-message">
+                                <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; margin-bottom: 10px;"></i><br>
+                                Arraste arquivos aqui ou clique para selecionar
+                            </div>
+                        </div>
+                    </div>
+                    <button id="enviar-documento-btn" class="btn btn-primary" disabled>
+                        <i class="fas fa-paperclip"></i> Anexar Documento
+                    </button>
+                </div>
+            </section>
+            
+            <!-- Calendário Section -->
+            <section id="calendario-section" class="section-content" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Calendário de Pontos</h3>
+                        <div>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-print"></i> Imprimir
+                            </button>
+                        </div>
+                    </div>
+                    <div id="calendar"></div>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Banco de Horas</h3>
+                        </div>
+                        <div class="flex items-center justify-between p-4">
+                            <div>
+                                <p class="text-3xl font-bold text-primary" id="banco-horas-saldo">+12.5h</p>
+                                <p class="text-sm text-gray-500">Saldo atual</p>
+                            </div>
+                            <div id="banco-horas-chart" style="width: 150px; height: 150px;"></div>
+                        </div>
+                        <div class="p-4 border-t">
+                            <p class="text-sm text-gray-500 mb-2">Próximo acerto: 05/06/2023</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Limite mensal: 20h</span>
+                                <div class="w-1/2 bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-primary h-2.5 rounded-full" style="width: 62.5%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Estatísticas</h3>
+                        </div>
+                        <div class="p-4">
+                            <div class="mb-4">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-700">Horas trabalhadas</span>
+                                    <span class="text-sm font-medium text-gray-700">168.5h</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-success h-2.5 rounded-full" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-700">Horas extras</span>
+                                    <span class="text-sm font-medium text-gray-700">12.5h</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-warning h-2.5 rounded-full" style="width: 25%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-700">Faltas</span>
+                                    <span class="text-sm font-medium text-gray-700">1 dia</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-error h-2.5 rounded-full" style="width: 5%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Férias Section -->
+            <section id="ferias-section" class="section-content" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Solicitar Férias</h3>
+                    </div>
+                    <form id="ferias-form">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Data de Início</label>
+                                <input type="date" class="form-control" id="ferias-inicio" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Data de Término</label>
+                                <input type="date" class="form-control" id="ferias-fim" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Observações</label>
+                            <textarea class="form-control" id="ferias-obs" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Solicitar Férias
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Minhas Solicitações</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Período</th>
+                                    <th>Dias</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ferias-items">
+                                <tr>
+                                    <td>15/07/2023 - 30/07/2023</td>
+                                    <td>15</td>
+                                    <td><span class="badge badge-success">Aprovado</span></td>
+                                    <td>
+                                        <button class="btn btn-outline btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>10/05/2023 - 25/05/2023</td>
+                                    <td>15</td>
+                                    <td><span class="badge badge-warning">Pendente</span></td>
+                                    <td>
+                                        <button class="btn btn-outline btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-outline btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>01/03/2023 - 15/03/2023</td>
+                                    <td>14</td>
+                                    <td><span class="badge badge-error">Recusado</span></td>
+                                    <td>
+                                        <button class="btn btn-outline btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Relatórios Section -->
+            <section id="relatorios-section" class="section-content" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Gerar Relatório</h3>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Data Inicial</label>
+                            <input type="date" class="form-control" id="relatorio-inicio">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Data Final</label>
+                            <input type="date" class="form-control" id="relatorio-fim">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Relatório</label>
+                        <select class="form-control" id="relatorio-tipo">
+                            <option value="mensal">Mensal</option>
+                            <option value="quinzenal">Quinzenal</option>
+                            <option value="personalizado">Personalizado</option>
+                        </select>
+                    </div>
+                    <button id="gerar-relatorio-btn" class="btn btn-primary">
+                        <i class="fas fa-chart-pie"></i> Gerar Relatório
+                    </button>
+                </div>
+                
+                <div class="card" id="relatorio-resultado" style="display: none;">
+                    <div class="card-header">
+                        <h3 class="card-title">Resultado do Relatório</h3>
+                        <div>
+                            <button id="exportar-pdf-btn" class="btn btn-outline">
+                                <i class="fas fa-file-pdf"></i> Exportar PDF
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-file-excel"></i> Exportar Excel
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div id="relatorio-resumo" class="mb-6"></div>
+                        <div class="chart-container">
+                            <canvas id="relatorio-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Admin Section -->
+            <section id="admin-section" class="section-content" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Painel Administrativo</h3>
+                    </div>
+                    <div class="grid-3">
+                        <div class="status-card">
+                            <div class="status-icon primary">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="status-info">
+                                <div class="status-title">Colaboradores</div>
+                                <div class="status-value">42</div>
+                            </div>
+                        </div>
+                        
+                        <div class="status-card">
+                            <div class="status-icon warning">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="status-info">
+                                <div class="status-title">Pendências</div>
+                                <div class="status-value">15</div>
+                            </div>
+                        </div>
+                        
+                        <div class="status-card">
+                            <div class="status-icon error">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="status-info">
+                                <div class="status-title">Atrasos (mês)</div>
+                                <div class="status-value">28</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Solicitações de Férias Pendentes</h3>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Colaborador</th>
+                                            <th>Período</th>
+                                            <th>Status</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-ferias-pendentes">
+                                        <!-- Dados serão carregados via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Registros Recentes</h3>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Colaborador</th>
+                                            <th>Data/Hora</th>
+                                            <th>Tipo</th>
+                                            <th>Método</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-pontos-recentes">
+                                        <!-- Dados serão carregados via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Invalidar Registros Section -->
+            <section id="invalidar-section" class="section-content" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Invalidar Registros de Ponto</h3>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Selecionar Colaborador</label>
+                        <select class="form-control" id="invalidar-colaborador">
+                            <option value="">Selecione um colaborador</option>
+                            <option value="1">John Doe</option>
+                            <option value="2">Carlos Silva</option>
+                            <option value="3">Ana Souza</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Período</label>
+                        <div class="grid-2">
+                            <input type="date" class="form-control" id="invalidar-inicio" placeholder="Data inicial">
+                            <input type="date" class="form-control" id="invalidar-fim" placeholder="Data final">
+                        </div>
+                    </div>
+                    <button id="buscar-registros-btn" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Buscar Registros
+                    </button>
+
+                    <div class="mt-4" id="registros-list" style="display: none;">
+                        <h4 class="text-lg font-semibold mb-3">Registros Encontrados</h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th width="40"><input type="checkbox" id="select-all-registros"></th>
+                                    <th>Data/Hora</th>
+                                    <th>Tipo</th>
+                                    <th>Método</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="registros-table-body">
+                                <!-- Registros serão carregados aqui -->
+                            </tbody>
+                        </table>
+
+                        <div class="form-group mt-4">
+                            <label class="form-label">Motivo da Invalidação</label>
+                            <textarea class="form-control" id="invalidar-motivo" rows="3" placeholder="Descreva o motivo para invalidar os registros selecionados"></textarea>
+                        </div>
+
+                        <button id="invalidar-registros-btn" class="btn btn-error mt-3">
+                            <i class="fas fa-ban"></i> Invalidar Registros Selecionados
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h3 class="card-title">Registros Invalidados</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Colaborador</th>
+                                    <th>Data/Hora</th>
+                                    <th>Tipo</th>
+                                    <th>Motivo</th>
+                                    <th>Invalidado por</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="registros-invalidados-table">
+                                <tr>
+                                    <td>Ana Souza</td>
+                                    <td>15/05/2023 08:15</td>
+                                    <td>Entrada</td>
+                                    <td>Registro duplicado</td>
+                                    <td>John Doe</td>
+                                    <td>
+                                        <button class="btn btn-outline btn-sm">
+                                            <i class="fas fa-undo"></i> Reverter
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cadastro de Colaboradores Section -->
+            <section id="colaboradores-section" class="section-content" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Cadastrar Novo Colaborador</h3>
+                    </div>
+                    <form id="colaborador-form">
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label class="form-label">Foto</label>
+                                <img src="https://via.placeholder.com/120" alt="Foto do Colaborador" class="employee-photo" id="employee-photo">
+                                <input type="file" id="employee-photo-input" accept="image/*" style="display: none;">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Nome Completo</label>
+                                <input type="text" class="form-control" id="colaborador-nome" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">CPF</label>
+                                <input type="text" class="form-control" id="colaborador-cpf" required>
+                            </div>
+                        </div>
+
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label class="form-label">Data de Nascimento</label>
+                                <input type="date" class="form-control" id="colaborador-nascimento" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">E-mail</label>
+                                <input type="email" class="form-control" id="colaborador-email" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Telefone</label>
+                                <input type="tel" class="form-control" id="colaborador-telefone">
+                            </div>
+                        </div>
+
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label class="form-label">Departamento</label>
+                                <select class="form-control" id="colaborador-departamento" required>
+                                    <option value="">Selecione</option>
+                                    <option value="1">TI</option>
+                                    <option value="2">Vendas</option>
+                                    <option value="3">Atendimento</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Cargo</label>
+                                <input type="text" class="form-control" id="colaborador-cargo" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Perfil de Acesso</label>
+                                <select class="form-control" id="colaborador-perfil" required>
+                                    <option value="user">Colaborador</option>
+                                    <option value="supervisor">Supervisor</option>
+                                    <option value="manager">Gerente</option>
+                                    <option value="admin">Administrador</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Data de Admissão</label>
+                                <input type="date" class="form-control" id="colaborador-admissao" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Jornada de Trabalho</label>
+                                <select class="form-control" id="colaborador-jornada" required>
+                                    <option value="8">8 horas diárias</option>
+                                    <option value="6">6 horas diárias</option>
+                                    <option value="4">4 horas diárias</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Observações</label>
+                            <textarea class="form-control" id="colaborador-observacoes" rows="2"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Cadastrar Colaborador
+                        </button>
+                    </form>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h3 class="card-title">Lista de Colaboradores</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="colaborador-search" placeholder="Pesquisar por nome, CPF ou departamento...">
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Foto</th>
+                                        <th>Nome</th>
+                                        <th>CPF</th>
+                                        <th>Departamento</th>
+                                        <th>Cargo</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="colaboradores-table">
+                                    <tr>
+                                        <td><img src="https://via.placeholder.com/40" alt="Foto" class="rounded-full" style="width: 40px; height: 40px;"></td>
+                                        <td>John Doe</td>
+                                        <td>123.456.789-00</td>
+                                        <td>TI</td>
+                                        <td>Administrador</td>
+                                        <td><span class="badge badge-success">Ativo</span></td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline btn-sm">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal -->
+    <div class="modal" id="notification-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Notificação</h3>
+                <button class="btn btn-outline btn-sm" id="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message">Mensagem de notificação aqui</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="modal-cancel">Cancelar</button>
+                <button class="btn btn-primary" id="modal-confirm">Confirmar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handtrackjs/dist/handtrack.min.js"></script>
+    
+    <script>
+        // =============================================
+        // Configurações Iniciais
+        // =============================================
+        const LOCAL_STORAGE_KEY = 'ponto-telecom-pro-data';
+        const JWT_SECRET = 'ponto-pro-secret-2023';
+        
+        // Cores do tema
+        const themeColors = {
+            primary: '#7c4dff',
+            primaryLight: '#b47cff',
+            primaryDark: '#3f1dcb',
+            secondary: '#00e5ff',
+            accent: '#ff4081',
+            success: '#4caf50',
+            warning: '#ff9800',
+            error: '#f44336'
+        };
+        
+        // =============================================
+        // Modelos de Dados
+        // =============================================
+        class User {
+            constructor(id, email, password, name, role, department, avatarColor) {
+                this.id = id;
+                this.email = email;
+                this.password = password;
+                this.name = name;
+                this.role = role;
+                this.department = department;
+                this.avatarColor = avatarColor;
+                this.createdAt = new Date().toISOString();
+                this.status = 'ativo';
+                this.cpf = '';
+                this.phone = '';
+                this.position = '';
+                this.hireDate = new Date().toISOString();
+                this.workHours = 8;
+            }
+        }
+        
+        class Ponto {
+            constructor(id, userId, tipo, data, localizacao, metodo = 'manual', observacao = '') {
+                this.id = id;
+                this.userId = userId;
+                this.tipo = tipo;
+                this.data = data;
+                this.localizacao = localizacao;
+                this.metodo = metodo;
+                this.observacao = observacao;
+                this.status = 'pendente'; // pendente, aprovado, rejeitado
+                this.approvedBy = null;
+                this.invalid = false;
+                this.invalidReason = '';
+                this.invalidBy = null;
+                this.invalidDate = null;
+            }
+        }
+        
+        class Ferias {
+            constructor(id, userId, inicio, fim, observacoes, status = 'pendente') {
+                this.id = id;
+                this.userId = userId;
+                this.inicio = inicio;
+                this.fim = fim;
+                this.observacoes = observacoes;
+                this.status = status;
+                this.dataSolicitacao = new Date().toISOString();
+                this.aprovadoPor = null;
+            }
+        }
+        
+        class Departamento {
+            constructor(id, nome, responsavelId) {
+                this.id = id;
+                this.nome = nome;
+                this.responsavelId = responsavelId;
+            }
+        }
+
+        class Documento {
+            constructor(id, pontoId, userId, tipo, filePath, fileName, uploadDate) {
+                this.id = id;
+                this.pontoId = pontoId;
+                this.userId = userId;
+                this.tipo = tipo;
+                this.filePath = filePath;
+                this.fileName = fileName;
+                this.uploadDate = uploadDate || new Date().toISOString();
+            }
+        }
+        
+        // =============================================
+        // Banco de Dados Simulado
+        // =============================================
+        function loadDatabase() {
+            const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (savedData) {
+                return JSON.parse(savedData);
+            }
+            
+            // Gerar dados iniciais
+            const initialData = {
+                users: [
+                    new User(1, 'admin@pontotelecom.com', 'admin123', 'Administrador', 'admin', 'TI', '#7c4dff'),
+                    new User(2, 'gerente@pontotelecom.com', 'gerente123', 'Carlos Silva', 'manager', 'Vendas', '#00e5ff'),
+                    new User(3, 'funcionario@pontotelecom.com', 'func123', 'Ana Souza', 'user', 'Atendimento', '#ff4081'),
+                    new User(4, 'supervisor@pontotelecom.com', 'super123', 'Márcia Oliveira', 'supervisor', 'Operações', '#4caf50')
+                ],
+                departamentos: [
+                    new Departamento(1, 'TI', 1),
+                    new Departamento(2, 'Vendas', 2),
+                    new Departamento(3, 'Atendimento', 4),
+                    new Departamento(4, 'Operações', 4)
+                ],
+                pontos: [],
+                ferias: [],
+                documentos: [],
+                configuracoes: {
+                    jornadaPadrao: 8,
+                    toleranciaAtraso: 10,
+                    limiteHorasExtras: 20
+                },
+                lastId: {
+                    user: 4,
+                    ponto: 0,
+                    ferias: 0,
+                    departamento: 4,
+                    documento: 0
+                }
+            };
+
+            // Preencher dados adicionais dos usuários
+            initialData.users[0].cpf = '123.456.789-00';
+            initialData.users[0].phone = '(11) 99999-9999';
+            initialData.users[0].position = 'Administrador de Sistemas';
+            initialData.users[0].hireDate = '2020-01-15';
+
+            initialData.users[1].cpf = '987.654.321-00';
+            initialData.users[1].phone = '(11) 98888-8888';
+            initialData.users[1].position = 'Gerente de Vendas';
+            initialData.users[1].hireDate = '2019-05-20';
+
+            initialData.users[2].cpf = '111.222.333-44';
+            initialData.users[2].phone = '(11) 97777-7777';
+            initialData.users[2].position = 'Atendente';
+            initialData.users[2].hireDate = '2021-03-10';
+
+            initialData.users[3].cpf = '555.666.777-88';
+            initialData.users[3].phone = '(11) 96666-6666';
+            initialData.users[3].position = 'Supervisora de Operações';
+            initialData.users[3].hireDate = '2018-11-05';
+            
+            // Gerar pontos de exemplo
+            const now = new Date();
+            for (let i = 1; i <= 3; i++) {
+                const date = new Date(now);
+                date.setDate(date.getDate() - i);
+                
+                // Ponto de entrada
+                initialData.pontos.push(new Ponto(
+                    initialData.lastId.ponto++,
+                    3,
+                    'entrada',
+                    new Date(date.setHours(8, 0, 0, 0)).toISOString(),
+                    { lat: -23.5505 + (Math.random() * 0.01), lng: -46.6333 + (Math.random() * 0.01) },
+                    'geolocalizacao'
+                ));
+                
+                // Ponto de saída
+                initialData.pontos.push(new Ponto(
+                    initialData.lastId.ponto++,
+                    3,
+                    'saida',
+                    new Date(date.setHours(17, 30, 0, 0)).toISOString(),
+                    { lat: -23.5505 + (Math.random() * 0.01), lng: -46.6333 + (Math.random() * 0.01) },
+                    'geolocalizacao'
+                ));
+            }
+
+            // Adicionar um registro inválido de exemplo
+            const invalidPonto = new Ponto(
+                initialData.lastId.ponto++,
+                3,
+                'entrada',
+                new Date(now.setHours(7, 45, 0, 0)).toISOString(),
+                { lat: -23.5505, lng: -46.6333 },
+                'geolocalizacao'
+            );
+            invalidPonto.invalid = true;
+            invalidPonto.invalidReason = 'Registro duplicado';
+            invalidPonto.invalidBy = 1;
+            invalidPonto.invalidDate = new Date().toISOString();
+            initialData.pontos.push(invalidPonto);
+            
+            // Gerar férias de exemplo
+            initialData.ferias.push(new Ferias(
+                initialData.lastId.ferias++,
+                3,
+                '2023-07-15',
+                '2023-07-30',
+                'Férias programadas'
+            ));
+
+            // Gerar documentos de exemplo
+            initialData.documentos.push(new Documento(
+                initialData.lastId.documento++,
+                1,
+                3,
+                'atestado',
+                '/uploads/atestado_1.pdf',
+                'atestado_medico.pdf',
+                new Date().toISOString()
+            ));
+            
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(initialData));
+            return initialData;
+        }
+        
+        function saveDatabase(data) {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+        }
+        
+        // =============================================
+        // Autenticação e Sessão
+        // =============================================
+        function generateToken(user) {
+            // Em produção, use uma biblioteca JWT real
+            const payload = {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                department: user.department,
+                exp: Date.now() + 3600000 // Expira em 1 hora
+            };
+            return btoa(JSON.stringify(payload));
+        }
+        
+        function verifyToken(token) {
+            try {
+                const payload = JSON.parse(atob(token));
+                if (payload.exp < Date.now()) {
+                    return null; // Token expirado
+                }
+                return payload;
+            } catch (e) {
+                return null;
+            }
+        }
+        
+        // =============================================
+        // Estado da Aplicação
+        // =============================================
+        let currentUser = null;
+        let currentToken = null;
+        let database = loadDatabase();
+        let handTrackModel = null;
+        let currentSection = 'dashboard';
+        let videoStream = null;
+        
+        // =============================================
+        // Elementos DOM
+        // =============================================
+        const sections = {
+            dashboard: document.getElementById('dashboard-section'),
+            registrar: document.getElementById('registrar-section'),
+            calendario: document.getElementById('calendario-section'),
+            ferias: document.getElementById('ferias-section'),
+            relatorios: document.getElementById('relatorios-section'),
+            admin: document.getElementById('admin-section'),
+            invalidar: document.getElementById('invalidar-section'),
+            colaboradores: document.getElementById('colaboradores-section')
+        };
+        
+        const navItems = document.querySelectorAll('.nav-item');
+        const userProfile = document.querySelector('.user-profile');
+        const userAvatar = document.querySelector('.user-avatar');
+        const userName = document.querySelector('.user-name');
+        const userRole = document.querySelector('.user-role');
+        
+        // Elementos do modal
+        const modal = document.getElementById('notification-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalClose = document.getElementById('modal-close');
+        const modalCancel = document.getElementById('modal-cancel');
+        const modalConfirm = document.getElementById('modal-confirm');
+        
+        // Toast container
+        const toastContainer = document.getElementById('toast-container');
+        
+        // Elementos de reconhecimento de gestos
+        const gestureVideo = document.getElementById('gestureVideo');
+        const gestureOverlay = document.getElementById('gesture-overlay');
+        const gestureInstruction = document.getElementById('gesture-instruction');
+        const gestureFeedback = document.getElementById('gesture-feedback');
+        const startGestureRecognitionBtn = document.getElementById('start-gesture-recognition');
+        const gestureRecognitionStatus = document.getElementById('gesture-recognition-status');
+        
+        // Dropzone para upload de documentos
+        let myDropzone;
+        
+        // =============================================
+        // Funções de Utilidade
+        // =============================================
+        function formatDate(dateString, includeTime = true) {
+            const date = new Date(dateString);
+            if (includeTime) {
+                return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+            return date.toLocaleDateString();
+        }
+        
+        function calcularDiferencaHoras(inicio, fim) {
+            const diffMs = (new Date(fim) - new Date(inicio));
+            return diffMs / (1000 * 60 * 60); // Converter para horas
+        }
+        
+        function showModal(title, message, confirmCallback = null) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            
+            if (confirmCallback) {
+                modalConfirm.style.display = 'inline-block';
+                modalConfirm.onclick = function() {
+                    confirmCallback();
+                    hideModal();
+                };
+            } else {
+                modalConfirm.style.display = 'none';
+            }
+            
+            modal.classList.add('active');
+        }
+        
+        function hideModal() {
+            modal.classList.remove('active');
+        }
+        
+        function showToast(message, type = 'info', duration = 5000) {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 
+                                 type === 'error' ? 'fa-exclamation-circle' : 
+                                 type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, duration);
+        }
+        
+        function updateUserProfile(user) {
+            userAvatar.textContent = user.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+            userAvatar.style.backgroundColor = user.avatarColor || themeColors.primary;
+            userName.textContent = user.name;
+            userRole.textContent = user.role === 'admin' ? 'Administrador' : 
+                                   user.role === 'manager' ? 'Gerente' : 
+                                   user.role === 'supervisor' ? 'Supervisor' : 'Colaborador';
+            
+            // Mostrar/ocultar itens de menu baseado no perfil
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.style.display = user.role === 'admin' ? 'flex' : 'none';
+            });
+        }
+        
+        // =============================================
+        // Navegação
+        // =============================================
+        function showSection(sectionId) {
+            // Esconder todas as seções
+            Object.values(sections).forEach(section => {
+                if (section) section.style.display = 'none';
+            });
+            
+            // Mostrar a seção selecionada
+            if (sections[sectionId]) {
+                sections[sectionId].style.display = 'block';
+                sections[sectionId].classList.add('fade-in');
+            }
+            
+            // Atualizar menu ativo
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.section === sectionId) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Atualizar título da página
+            const pageTitle = document.querySelector('.page-title');
+            if (pageTitle) {
+                switch (sectionId) {
+                    case 'dashboard':
+                        pageTitle.textContent = 'Dashboard';
+                        break;
+                    case 'registrar':
+                        pageTitle.textContent = 'Registrar Ponto';
+                        break;
+                    case 'calendario':
+                        pageTitle.textContent = 'Calendário';
+                        break;
+                    case 'ferias':
+                        pageTitle.textContent = 'Férias';
+                        break;
+                    case 'relatorios':
+                        pageTitle.textContent = 'Relatórios';
+                        break;
+                    case 'admin':
+                        pageTitle.textContent = 'Administração';
+                        break;
+                    case 'invalidar':
+                        pageTitle.textContent = 'Invalidar Registros';
+                        break;
+                    case 'colaboradores':
+                        pageTitle.textContent = 'Cadastrar Colaborador';
+                        break;
+                }
+            }
+            
+            // Executar funções específicas da seção
+            switch (sectionId) {
+                case 'registrar':
+                    initRegistrarPonto();
+                    break;
+                case 'calendario':
+                    initCalendario();
+                    break;
+                case 'ferias':
+                    initFerias();
+                    break;
+                case 'relatorios':
+                    initRelatorios();
+                    break;
+                case 'admin':
+                    initAdmin();
+                    break;
+                case 'invalidar':
+                    initInvalidarRegistros();
+                    break;
+                case 'colaboradores':
+                    initColaboradores();
+                    break;
+            }
+            
+            currentSection = sectionId;
+        }
+        
+        // =============================================
+        // Funcionalidades de Ponto
+        // =============================================
+        function initRegistrarPonto() {
+            const tipoRegistro = document.getElementById('tipo-registro');
+            const locationInfo = document.getElementById('location-info');
+            const registrarPontoBtn = document.getElementById('registrar-ponto-btn');
+            const registroStatus = document.getElementById('registro-status');
+            const enviarDocumentoBtn = document.getElementById('enviar-documento-btn');
+            
+            // Obter localização
+            getLocation();
+            
+            // Configurar reconhecimento de gestos
+            initGestureRecognition();
+            
+            // Configurar dropzone para upload de documentos
+            initDocumentDropzone();
+            
+            // Registrar ponto manual
+            registrarPontoBtn.addEventListener('click', registrarPonto);
+            
+            // Enviar documento
+            enviarDocumentoBtn.addEventListener('click', enviarDocumento);
+            
+            function getLocation() {
+                if (navigator.geolocation) {
+                    locationInfo.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Obtendo localização...';
+                    registrarPontoBtn.disabled = true;
+                    
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            locationInfo.innerHTML = `<i class="fas fa-map-marker-alt"></i> Localização obtida: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                            registrarPontoBtn.disabled = false;
+                        },
+                        (error) => {
+                            locationInfo.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Erro ao obter localização: ${error.message}`;
+                            registrarPontoBtn.disabled = true;
+                        },
+                        { enableHighAccuracy: true, timeout: 10000 }
+                    );
+                } else {
+                    locationInfo.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Geolocalização não suportada';
+                    registrarPontoBtn.disabled = true;
+                }
+            }
+            
+            function registrarPonto() {
+                if (!navigator.geolocation) {
+                    registroStatus.innerHTML = '<div class="text-error"><i class="fas fa-exclamation-circle"></i> Geolocalização não suportada</div>';
+                    return;
+                }
+                
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const novoPonto = new Ponto(
+                            database.lastId.ponto++,
+                            currentUser.id,
+                            tipoRegistro.value,
+                            new Date().toISOString(),
+                            {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            },
+                            'geolocalizacao'
+                        );
+                        
+                        database.pontos.push(novoPonto);
+                        saveDatabase(database);
+                        
+                        registroStatus.innerHTML = `
+                            <div class="text-success">
+                                <i class="fas fa-check-circle"></i> Ponto registrado com sucesso!
+                                <div class="mt-2 text-sm">
+                                    <p><strong>Data/Hora:</strong> ${formatDate(novoPonto.data)}</p>
+                                    <p><strong>Tipo:</strong> ${novoPonto.tipo === 'entrada' ? 'Entrada' : novoPonto.tipo === 'saida' ? 'Saída' : 'Intervalo'}</p>
+                                </div>
+                            </div>
+                        `;
+                        
+                        showToast('Ponto registrado com sucesso!', 'success');
+                        
+                        // Atualizar calendário se estiver visível
+                        if (currentSection === 'calendario') {
+                            initCalendario();
+                        }
+
+                        // Atualizar espelho de ponto
+                        updateMirrorView();
+                    },
+                    (error) => {
+                        registroStatus.innerHTML = `<div class="text-error"><i class="fas fa-exclamation-circle"></i> Erro ao obter localização: ${error.message}</div>`;
+                    }
+                );
+            }
+            
+            function initGestureRecognition() {
+                startGestureRecognitionBtn.addEventListener('click', startGestureRecognition);
+                
+                // Carregar modelo de reconhecimento de mãos
+                handTrack.load().then(model => {
+                    handTrackModel = model;
+                    gestureRecognitionStatus.innerHTML = '<span class="text-success"><i class="fas fa-check-circle"></i> Modelo de gestos carregado</span>';
+                }).catch(err => {
+                    gestureRecognitionStatus.innerHTML = `<span class="text-error"><i class="fas fa-exclamation-circle"></i> Erro ao carregar modelo: ${err.message}</span>`;
+                });
+            }
+            
+            function startGestureRecognition() {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    gestureOverlay.style.display = 'flex';
+                    gestureInstruction.style.display = 'none';
+                    gestureFeedback.textContent = '';
+                    startGestureRecognitionBtn.disabled = true;
+                    
+                    navigator.mediaDevices.getUserMedia({ video: true })
+                        .then(function(stream) {
+                            videoStream = stream;
+                            gestureVideo.srcObject = stream;
+                            gestureVideo.play();
+                            
+                            // Iniciar detecção de gestos
+                            detectGesture();
+                        })
+                        .catch(function(error) {
+                            gestureOverlay.style.display = 'none';
+                            gestureRecognitionStatus.innerHTML = `<span class="text-error"><i class="fas fa-exclamation-circle"></i> Erro ao acessar câmera: ${error.message}</span>`;
+                            startGestureRecognitionBtn.disabled = false;
+                        });
+                } else {
+                    gestureRecognitionStatus.innerHTML = '<span class="text-error"><i class="fas fa-exclamation-circle"></i> Acesso à câmera não suportado</span>';
+                }
+            }
+            
+            function detectGesture() {
+                if (!handTrackModel) return;
+                
+                handTrackModel.detect(gestureVideo).then(predictions => {
+                    // Verificar se há mãos detectadas
+                    if (predictions.length > 0) {
+                        const hand = predictions[0];
+                        
+                        // Verificar posição da mão (simulação de gesto)
+                        if (hand.bbox[1] < 100) { // Mão na parte superior
+                            gestureFeedback.textContent = 'Gesto detectado: Mão levantada!';
+                            gestureFeedback.style.color = '#4caf50';
+                            
+                            // Registrar ponto após 2 segundos de gesto mantido
+                            setTimeout(() => {
+                                if (gestureFeedback.textContent.includes('Mão levantada!')) {
+                                    registerGesturePoint();
+                                }
+                            }, 2000);
+                        } else {
+                            gestureFeedback.textContent = 'Faça o gesto levantando a mão';
+                            gestureFeedback.style.color = 'white';
+                        }
+                    } else {
+                        gestureFeedback.textContent = 'Mostre a mão para a câmera';
+                        gestureFeedback.style.color = 'white';
+                    }
+                    
+                    // Continuar detecção
+                    requestAnimationFrame(detectGesture);
+                });
+            }
+            
+            function registerGesturePoint() {
+                if (!videoStream) return;
+                
+                // Parar a câmera
+                videoStream.getTracks().forEach(track => track.stop());
+                gestureOverlay.style.display = 'none';
+                gestureInstruction.style.display = 'block';
+                
+                // Registrar ponto automaticamente
+                const novoPonto = new Ponto(
+                    database.lastId.ponto++,
+                    currentUser.id,
+                    'entrada',
+                    new Date().toISOString(),
+                    { lat: 0, lng: 0 },
+                    'reconhecimento_gestos'
+                );
+                
+                database.pontos.push(novoPonto);
+                saveDatabase(database);
+                
+                gestureRecognitionStatus.innerHTML = '<span class="text-success"><i class="fas fa-check-circle"></i> Ponto registrado via reconhecimento de gestos!</span>';
+                showToast('Ponto registrado via reconhecimento de gestos!', 'success');
+                
+                // Atualizar status
+                registroStatus.innerHTML = `
+                    <div class="text-success">
+                        <i class="fas fa-check-circle"></i> Ponto registrado via reconhecimento de gestos!
+                        <div class="mt-2 text-sm">
+                            <p><strong>Data/Hora:</strong> ${formatDate(novoPonto.data)}</p>
+                            <p><strong>Método:</strong> Reconhecimento de Gestos</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Atualizar calendário se estiver visível
+                if (currentSection === 'calendario') {
+                    initCalendario();
+                }
+
+                // Atualizar espelho de ponto
+                updateMirrorView();
+                
+                // Resetar após 5 segundos
+                setTimeout(() => {
+                    gestureRecognitionStatus.innerHTML = '';
+                    startGestureRecognitionBtn.disabled = false;
+                }, 5000);
+            }
+            
+            function initDocumentDropzone() {
+                myDropzone = new Dropzone("#document-dropzone", {
+                    url: "/fake-url", // Em produção, substituir por URL real
+                    paramName: "file",
+                    maxFilesize: 5, // MB
+                    acceptedFiles: "image/*,.pdf,.doc,.docx",
+                    addRemoveLinks: true,
+                    dictDefaultMessage: "Arraste arquivos aqui ou clique para selecionar",
+                    dictFallbackMessage: "Seu navegador não suporta upload de arquivos por arrastar e soltar.",
+                    dictFileTooBig: "Arquivo muito grande ({{filesize}}MB). Tamanho máximo: {{maxFilesize}}MB.",
+                    dictInvalidFileType: "Tipo de arquivo não permitido.",
+                    dictResponseError: "Servidor respondeu com código {{statusCode}}.",
+                    dictCancelUpload: "Cancelar upload",
+                    dictUploadCanceled: "Upload cancelado.",
+                    dictRemoveFile: "Remover arquivo",
+                    dictMaxFilesExceeded: "Você não pode enviar mais arquivos.",
+                    autoProcessQueue: false
+                });
+                
+                myDropzone.on("addedfile", function(file) {
+                    document.getElementById('enviar-documento-btn').disabled = false;
+                });
+                
+                myDropzone.on("removedfile", function(file) {
+                    if (myDropzone.files.length === 0) {
+                        document.getElementById('enviar-documento-btn').disabled = true;
+                    }
+                });
+            }
+            
+            function enviarDocumento() {
+                const registroId = document.getElementById('documento-registro').value;
+                const tipoDocumento = document.getElementById('documento-tipo').value;
+                
+                if (!registroId) {
+                    showToast('Selecione um registro para associar o documento', 'error');
+                    return;
+                }
+                
+                if (myDropzone.files.length === 0) {
+                    showToast('Selecione um arquivo para enviar', 'error');
+                    return;
+                }
+                
+                // Simular upload (em produção, enviar para o servidor)
+                const file = myDropzone.files[0];
+                const novoDocumento = new Documento(
+                    database.lastId.documento++,
+                    parseInt(registroId),
+                    currentUser.id,
+                    tipoDocumento,
+                    `/uploads/${file.name}`,
+                    file.name
+                );
+                
+                database.documentos.push(novoDocumento);
+                saveDatabase(database);
+                
+                showToast('Documento anexado com sucesso!', 'success');
+                
+                // Limpar dropzone
+                myDropzone.removeAllFiles(true);
+                document.getElementById('enviar-documento-btn').disabled = true;
+            }
+        }
+        
+        // =============================================
+        // Calendário e Banco de Horas
+        // =============================================
+        function initCalendario() {
+            // Inicializar calendário principal
+            const calendarEl = document.getElementById('calendar');
+            if (calendarEl._fullCalendar) {
+                calendarEl._fullCalendar.destroy();
+            }
+            
+            const userPontos = database.pontos.filter(p => p.userId === currentUser.id);
+            const events = userPontos.map(ponto => ({
+                title: ponto.tipo === 'entrada' ? 'Entrada' : ponto.tipo === 'saida' ? 'Saída' : 'Intervalo',
+                start: ponto.data,
+                color: ponto.invalid ? themeColors.error : 
+                       ponto.tipo === 'entrada' ? themeColors.primary : 
+                       ponto.tipo === 'saida' ? themeColors.accent : themeColors.secondary,
+                extendedProps: {
+                    metodo: ponto.metodo,
+                    localizacao: ponto.localizacao,
+                    observacao: ponto.observacao,
+                    invalid: ponto.invalid,
+                    invalidReason: ponto.invalidReason
+                }
+            }));
+            
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                eventClick: function(info) {
+                    const ponto = info.event;
+                    const metodo = ponto.extendedProps.metodo === 'geolocalizacao' ? 'Geolocalização' :
+                                  ponto.extendedProps.metodo === 'reconhecimento_facial' ? 'Reconhecimento Facial' :
+                                  ponto.extendedProps.metodo === 'reconhecimento_gestos' ? 'Reconhecimento de Gestos' :
+                                  'Manual';
+                    
+                    let message = `
+                        <p><strong>Data/Hora:</strong> ${formatDate(ponto.start)}</p>
+                        <p><strong>Método:</strong> ${metodo}</p>
+                        ${ponto.extendedProps.localizacao ? `<p><strong>Localização:</strong> ${ponto.extendedProps.localizacao.lat.toFixed(4)}, ${ponto.extendedProps.localizacao.lng.toFixed(4)}</p>` : ''}
+                        ${ponto.extendedProps.observacao ? `<p><strong>Observação:</strong> ${ponto.extendedProps.observacao}</p>` : ''}
+                    `;
+                    
+                    if (ponto.extendedProps.invalid) {
+                        message += `
+                            <div class="mt-3 p-2 bg-red-50 rounded">
+                                <p class="text-red-600"><strong><i class="fas fa-ban"></i> Registro Invalidado</strong></p>
+                                <p><strong>Motivo:</strong> ${ponto.extendedProps.invalidReason}</p>
+                            </div>
+                        `;
+                    }
+                    
+                    showModal(
+                        `Detalhes do Ponto: ${ponto.title}`,
+                        message
+                    );
+                },
+                events: events,
+                locale: 'pt-br',
+                buttonText: {
+                    today: 'Hoje',
+                    month: 'Mês',
+                    week: 'Semana',
+                    day: 'Dia'
+                }
+            });
+            
+            calendar.render();
+            
+            // Inicializar mini calendário (dashboard)
+            const miniCalendarEl = document.getElementById('mini-calendar');
+            if (miniCalendarEl) {
+                if (miniCalendarEl._fullCalendar) {
+                    miniCalendarEl._fullCalendar.destroy();
+                }
+                
+                new FullCalendar.Calendar(miniCalendarEl, {
+                    initialView: 'dayGridMonth',
+                    headerToolbar: {
+                        left: 'title',
+                        right: 'prev,next'
+                    },
+                    height: 'auto',
+                    events: events,
+                    locale: 'pt-br'
+                }).render();
+            }
+            
+            // Calcular e exibir banco de horas
+            updateBancoHoras();
+        }
+        
+        function updateBancoHoras() {
+            const userPontos = database.pontos.filter(p => p.userId === currentUser.id && !p.invalid);
+            let saldo = 0;
+            let horasTrabalhadas = 0;
+            let horasExtras = 0;
+            let faltas = 0;
+            
+            // Ordenar por data
+            userPontos.sort((a, b) => new Date(a.data) - new Date(b.data));
+            
+            // Calcular horas trabalhadas
+            for (let i = 0; i < userPontos.length; i++) {
+                if (userPontos[i].tipo === 'entrada' && i + 1 < userPontos.length && userPontos[i + 1].tipo === 'saida') {
+                    const horas = calcularDiferencaHoras(userPontos[i].data, userPontos[i + 1].data);
+                    horasTrabalhadas += horas;
+                    
+                    // Considerar 8h como jornada normal
+                    if (horas > 8) {
+                        horasExtras += horas - 8;
+                    } else if (horas < 8) {
+                        saldo -= (8 - horas);
+                    }
+                }
+            }
+            
+            // Calcular faltas (considerando 22 dias úteis)
+            const diasTrabalhados = horasTrabalhadas / 8;
+            faltas = Math.max(0, 22 - diasTrabalhados);
+            
+            // Atualizar exibição
+            const bancoHorasSaldoEl = document.getElementById('banco-horas-saldo');
+            if (bancoHorasSaldoEl) {
+                bancoHorasSaldoEl.textContent = saldo >= 0 ? `+${saldo.toFixed(1)}h` : `${saldo.toFixed(1)}h`;
+                bancoHorasSaldoEl.style.color = saldo >= 0 ? themeColors.success : themeColors.error;
+            }
+            
+            // Atualizar gráfico
+            const ctx = document.createElement('canvas');
+            const chartContainer = document.getElementById('banco-horas-chart');
+            if (chartContainer) {
+                chartContainer.innerHTML = '';
+                chartContainer.appendChild(ctx);
+                
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Horas Normais', 'Horas Extras', 'Saldo'],
+                        datasets: [{
+                            data: [horasTrabalhadas - horasExtras, horasExtras, Math.abs(saldo)],
+                            backgroundColor: [
+                                themeColors.primary,
+                                themeColors.warning,
+                                saldo >= 0 ? themeColors.success : themeColors.error
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.label}: ${context.raw.toFixed(1)}h`;
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '70%'
+                    }
+                });
+            }
+            
+            // Atualizar estatísticas (seção de relatórios)
+            if (currentSection === 'relatorios') {
+                initRelatorios();
+            }
+        }
+
+        // Atualizar espelho de ponto
+        function updateMirrorView() {
+            const mirrorView = document.getElementById('mirror-view');
+            if (!mirrorView) return;
+            
+            const userPontos = database.pontos
+                .filter(p => p.userId === currentUser.id)
+                .sort((a, b) => new Date(b.data) - new Date(a.data))
+                .slice(0, 5);
+            
+            mirrorView.innerHTML = '';
+            
+            if (userPontos.length === 0) {
+                mirrorView.innerHTML = '<div class="text-center py-4 text-gray-500">Nenhum registro encontrado</div>';
+                return;
+            }
+            
+            userPontos.forEach(ponto => {
+                const item = document.createElement('div');
+                item.className = 'mirror-item';
+                
+                const date = new Date(ponto.data);
+                const dateStr = date.toLocaleDateString() === new Date().toLocaleDateString() ? 
+                    'Hoje' : date.toLocaleDateString();
+                
+                const tipo = ponto.tipo === 'entrada' ? 'Entrada' : 
+                             ponto.tipo === 'saida' ? 'Saída' : 'Intervalo';
+                
+                item.innerHTML = `
+                    <span>${dateStr}</span>
+                    <span>${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${tipo}</span>
+                `;
+                
+                if (ponto.invalid) {
+                    item.innerHTML += `<span class="text-error"><i class="fas fa-ban"></i></span>`;
+                }
+                
+                mirrorView.appendChild(item);
+            });
+        }
+        
+        // =============================================
+        // Funcionalidades de Férias
+        // =============================================
+        function initFerias() {
+            const feriasForm = document.getElementById('ferias-form');
+            const feriasItems = document.getElementById('ferias-items');
+            
+            // Carregar solicitações de férias
+            loadFerias();
+            
+            // Enviar nova solicitação
+            feriasForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const inicio = document.getElementById('ferias-inicio').value;
+                const fim = document.getElementById('ferias-fim').value;
+                const obs = document.getElementById('ferias-obs').value;
+                
+                if (!inicio || !fim) {
+                    showToast('Preencha as datas de início e término', 'error');
+                    return;
+                }
+                
+                if (new Date(fim) < new Date(inicio)) {
+                    showToast('Data de término deve ser após a data de início', 'error');
+                    return;
+                }
+                
+                const novaFerias = new Ferias(
+                    database.lastId.ferias++,
+                    currentUser.id,
+                    inicio,
+                    fim,
+                    obs
+                );
+                
+                database.ferias.push(novaFerias);
+                saveDatabase(database);
+                feriasForm.reset();
+                
+                showToast('Solicitação de férias enviada com sucesso!', 'success');
+                loadFerias();
+            });
+            
+            function loadFerias() {
+                const userFerias = database.ferias.filter(f => f.userId === currentUser.id)
+                    .sort((a, b) => new Date(b.dataSolicitacao) - new Date(a.dataSolicitacao));
+                
+                feriasItems.innerHTML = '';
+                
+                if (userFerias.length === 0) {
+                    feriasItems.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">Nenhuma solicitação de férias encontrada</td></tr>';
+                    return;
+                }
+                
+                userFerias.forEach(ferias => {
+                    const inicio = new Date(ferias.inicio);
+                    const fim = new Date(ferias.fim);
+                    const diffTime = Math.abs(fim - inicio);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                    
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50';
+                    row.innerHTML = `
+                        <td class="py-3">${formatDate(ferias.inicio, false)} - ${formatDate(ferias.fim, false)}</td>
+                        <td class="py-3">${diffDays} dias</td>
+                        <td class="py-3">
+                            ${ferias.status === 'aprovado' ? 
+                              `<span class="badge badge-success"><i class="fas fa-check-circle"></i> Aprovado</span>` : 
+                              ferias.status === 'pendente' ? 
+                              `<span class="badge badge-warning"><i class="fas fa-clock"></i> Pendente</span>` : 
+                              `<span class="badge badge-error"><i class="fas fa-times-circle"></i> Recusado</span>`}
+                        </td>
+                        <td class="py-3">
+                            <button class="btn btn-outline btn-sm view-ferias" data-id="${ferias.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${ferias.status === 'pendente' ? `
+                                <button class="btn btn-outline btn-sm edit-ferias" data-id="${ferias.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-outline btn-sm delete-ferias" data-id="${ferias.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </td>
+                    `;
+                    
+                    feriasItems.appendChild(row);
+                });
+                
+                // Adicionar event listeners aos botões
+                document.querySelectorAll('.view-ferias').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const feriasId = parseInt(this.dataset.id);
+                        viewFerias(feriasId);
+                    });
+                });
+                
+                document.querySelectorAll('.edit-ferias').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const feriasId = parseInt(this.dataset.id);
+                        editFerias(feriasId);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-ferias').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const feriasId = parseInt(this.dataset.id);
+                        deleteFerias(feriasId);
+                    });
+                });
+            }
+            
+            function viewFerias(id) {
+                const ferias = database.ferias.find(f => f.id === id);
+                if (!ferias) return;
+                
+                const user = database.users.find(u => u.id === ferias.userId);
+                const inicio = new Date(ferias.inicio);
+                const fim = new Date(ferias.fim);
+                const diffTime = Math.abs(fim - inicio);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                
+                showModal(
+                    'Detalhes da Solicitação de Férias',
+                    `
+                    <div class="space-y-3">
+                        <p><strong>Colaborador:</strong> ${user ? user.name : 'N/A'}</p>
+                        <p><strong>Período:</strong> ${formatDate(ferias.inicio, false)} - ${formatDate(ferias.fim, false)} (${diffDays} dias)</p>
+                        <p><strong>Status:</strong> ${ferias.status === 'aprovado' ? 'Aprovado' : ferias.status === 'pendente' ? 'Pendente' : 'Recusado'}</p>
+                        <p><strong>Solicitado em:</strong> ${formatDate(ferias.dataSolicitacao)}</p>
+                        ${ferias.observacoes ? `<p><strong>Observações:</strong> ${ferias.observacoes}</p>` : ''}
+                        ${ferias.aprovadoPor ? `<p><strong>Aprovado por:</strong> ${database.users.find(u => u.id === ferias.aprovadoPor)?.name || 'N/A'}</p>` : ''}
+                    </div>
+                    `
+                );
+            }
+            
+            function editFerias(id) {
+                const ferias = database.ferias.find(f => f.id === id);
+                if (!ferias) return;
+                
+                document.getElementById('ferias-inicio').value = ferias.inicio;
+                document.getElementById('ferias-fim').value = ferias.fim;
+                document.getElementById('ferias-obs').value = ferias.observacoes || '';
+                
+                // Rolar para o formulário
+                document.getElementById('ferias-form').scrollIntoView({ behavior: 'smooth' });
+                
+                showToast('Preencha o formulário para editar a solicitação', 'info');
+            }
+            
+            function deleteFerias(id) {
+                showModal(
+                    'Confirmar Exclusão',
+                    'Tem certeza que deseja excluir esta solicitação de férias?',
+                    function() {
+                        database.ferias = database.ferias.filter(f => f.id !== id);
+                        saveDatabase(database);
+                        loadFerias();
+                        showToast('Solicitação de férias excluída com sucesso', 'success');
+                    }
+                );
+            }
+        }
+        
+        // =============================================
+        // Relatórios
+        // =============================================
+        function initRelatorios() {
+            const gerarRelatorioBtn = document.getElementById('gerar-relatorio-btn');
+            const relatorioResultado = document.getElementById('relatorio-resultado');
+            const relatorioResumo = document.getElementById('relatorio-resumo');
+            const exportarPdfBtn = document.getElementById('exportar-pdf-btn');
+            
+            gerarRelatorioBtn.addEventListener('click', gerarRelatorio);
+            exportarPdfBtn.addEventListener('click', exportarPDF);
+            
+            function gerarRelatorio() {
+                const inicio = document.getElementById('relatorio-inicio').value;
+                const fim = document.getElementById('relatorio-fim').value;
+                const tipo = document.getElementById('relatorio-tipo').value;
+                
+                if (!inicio || !fim) {
+                    showToast('Selecione o período para gerar o relatório', 'error');
+                    return;
+                }
+                
+                if (new Date(fim) < new Date(inicio)) {
+                    showToast('Data final deve ser após a data inicial', 'error');
+                    return;
+                }
+                
+                const userPontos = database.pontos.filter(p => 
+                    p.userId === currentUser.id && 
+                    !p.invalid &&
+                    new Date(p.data) >= new Date(inicio) && 
+                    new Date(p.data) <= new Date(fim)
+                );
+                
+                let horasTrabalhadas = 0;
+                let horasExtras = 0;
+                let entradas = 0;
+                let saidas = 0;
+                let intervalos = 0;
+                let faltas = 0;
+                
+                // Calcular totais
+                userPontos.forEach(ponto => {
+                    if (ponto.tipo === 'entrada') entradas++;
+                    if (ponto.tipo === 'saida') saidas++;
+                    if (ponto.tipo === 'intervalo') intervalos++;
+                });
+                
+                // Calcular horas trabalhadas e extras
+                const diasTrabalhados = Math.min(entradas, saidas);
+                horasTrabalhadas = diasTrabalhados * 8;
+                
+                // Considerar horas extras (acima de 8h por dia)
+                for (let i = 0; i < userPontos.length; i++) {
+                    if (userPontos[i].tipo === 'entrada' && i + 1 < userPontos.length && userPontos[i + 1].tipo === 'saida') {
+                        const horas = calcularDiferencaHoras(userPontos[i].data, userPontos[i + 1].data);
+                        if (horas > 8) {
+                            horasExtras += horas - 8;
+                        }
+                    }
+                }
+                
+                // Calcular faltas (considerando 22 dias úteis por mês)
+                const meses = (new Date(fim) - new Date(inicio)) / (1000 * 60 * 60 * 24 * 30);
+                faltas = Math.max(0, Math.floor(22 * meses) - diasTrabalhados);
+                
+                // Atualizar resumo
+                relatorioResumo.innerHTML = `
+                    <div class="grid-2 mb-6">
+                        <div>
+                            <h4 class="text-lg font-semibold mb-3">Resumo do Período</h4>
+                            <div class="space-y-2">
+                                <p><strong>Período:</strong> ${formatDate(inicio, false)} - ${formatDate(fim, false)}</p>
+                                <p><strong>Total de Registros:</strong> ${userPontos.length}</p>
+                                <p><strong>Dias Trabalhados:</strong> ${diasTrabalhados}</p>
+                                <p><strong>Horas Trabalhadas:</strong> ${horasTrabalhadas.toFixed(1)}h</p>
+                                <p><strong>Horas Extras:</strong> ${horasExtras.toFixed(1)}h</p>
+                                <p><strong>Faltas:</strong> ${faltas} dia(s)</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold mb-3">Distribuição</h4>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span>Entradas</span>
+                                    <span>${entradas}</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span>Saídas</span>
+                                    <span>${saidas}</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span>Intervalos</span>
+                                    <span>${intervalos}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Atualizar gráfico
+                const ctx = document.getElementById('relatorio-chart');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Entradas', 'Saídas', 'Intervalos', 'Horas Trabalhadas', 'Horas Extras', 'Faltas'],
+                            datasets: [{
+                                label: 'Resumo',
+                                data: [entradas, saidas, intervalos, horasTrabalhadas, horasExtras, faltas],
+                                backgroundColor: [
+                                    themeColors.primary,
+                                    themeColors.accent,
+                                    themeColors.secondary,
+                                    themeColors.success,
+                                    themeColors.warning,
+                                    themeColors.error
+                                ],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `${context.label}: ${context.raw}${context.datasetIndex >= 3 ? 'h' : ''}`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                relatorioResultado.style.display = 'block';
+                showToast('Relatório gerado com sucesso', 'success');
+            }
+            
+            function exportarPDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Cabeçalho
+                doc.setFontSize(18);
+                doc.setTextColor(themeColors.primaryDark);
+                doc.text('Relatório de Ponto - PontoPlus', 105, 20, { align: 'center' });
+                
+                // Informações do usuário e período
+                doc.setFontSize(12);
+                doc.setTextColor(themeColors.text);
+                doc.text(`Colaborador: ${currentUser.name}`, 20, 30);
+                doc.text(`Período: ${formatDate(document.getElementById('relatorio-inicio').value, false)} - ${formatDate(document.getElementById('relatorio-fim').value, false)}`, 20, 37);
+                doc.text(`Gerado em: ${formatDate(new Date().toISOString())}`, 20, 44);
+                
+                // Linha divisória
+                doc.setDrawColor(themeColors.primaryLight);
+                doc.setLineWidth(0.5);
+                doc.line(20, 50, 190, 50);
+                
+                // Resumo
+                doc.setFontSize(14);
+                doc.setTextColor(themeColors.primaryDark);
+                doc.text('Resumo do Período', 20, 60);
+                
+                doc.setFontSize(10);
+                doc.setTextColor(themeColors.text);
+                
+                // Obter dados do resumo
+                const resumoLines = relatorioResumo.textContent.split('\n').filter(l => l.trim());
+                let y = 70;
+                
+                resumoLines.forEach(line => {
+                    if (line.trim() !== '') {
+                        doc.text(line.trim(), 20, y);
+                        y += 7;
+                    }
+                });
+                
+                // Adicionar gráfico (simplificado)
+                y += 10;
+                doc.setFontSize(14);
+                doc.setTextColor(themeColors.primaryDark);
+                doc.text('Distribuição', 20, y);
+                y += 10;
+                
+                // Simular gráfico com barras
+                const data = [entradas, saidas, intervalos, horasTrabalhadas, horasExtras, faltas];
+                const labels = ['Entradas', 'Saídas', 'Intervalos', 'Horas Trab.', 'Horas Extras', 'Faltas'];
+                const colors = [
+                    themeColors.primary,
+                    themeColors.accent,
+                    themeColors.secondary,
+                    themeColors.success,
+                    themeColors.warning,
+                    themeColors.error
+                ];
+                
+                const maxValue = Math.max(...data);
+                const barWidth = 160;
+                const barHeight = 10;
+                const startX = 30;
+                
+                labels.forEach((label, i) => {
+                    // Barra
+                    const barLength = (data[i] / maxValue) * barWidth;
+                    doc.setFillColor(colors[i]);
+                    doc.rect(startX, y, barLength, barHeight, 'F');
+                    
+                    // Label e valor
+                    doc.setTextColor(themeColors.text);
+                    doc.text(label, 20, y + 7);
+                    doc.text(data[i].toString() + (i >= 3 ? 'h' : ''), startX + barWidth + 5, y + 7);
+                    
+                    y += 15;
+                });
+                
+                // Rodapé
+                doc.setFontSize(8);
+                doc.setTextColor(themeColors.textLight);
+                doc.text('Sistema PontoPlus - Telecom © 2023', 105, 285, { align: 'center' });
+                
+                // Salvar PDF
+                doc.save(`relatorio_ponto_${currentUser.name}_${new Date().toISOString().split('T')[0]}.pdf`);
+                showToast('PDF exportado com sucesso', 'success');
+            }
+        }
+        
+        // =============================================
+        // Painel Administrativo
+        // =============================================
+        function initAdmin() {
+            // Carregar dados administrativos
+            loadAdminData();
+            
+            function loadAdminData() {
+                // Carregar solicitações de férias pendentes
+                const feriasPendentes = database.ferias.filter(f => f.status === 'pendente')
+                    .sort((a, b) => new Date(a.dataSolicitacao) - new Date(b.dataSolicitacao));
+                
+                const feriasContainer = document.getElementById('admin-ferias-pendentes');
+                feriasContainer.innerHTML = '';
+                
+                if (feriasPendentes.length === 0) {
+                    feriasContainer.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">Nenhuma solicitação de férias pendente</td></tr>';
+                } else {
+                    feriasPendentes.forEach(ferias => {
+                        const user = database.users.find(u => u.id === ferias.userId);
+                        const inicio = new Date(ferias.inicio);
+                        const fim = new Date(ferias.fim);
+                        const diffTime = Math.abs(fim - inicio);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                        
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="py-3">${user ? user.name : 'N/A'}</td>
+                            <td class="py-3">${formatDate(ferias.inicio, false)} - ${formatDate(ferias.fim, false)}</td>
+                            <td class="py-3">${diffDays} dias</td>
+                            <td class="py-3">
+                                <button class="btn btn-outline btn-sm approve-ferias" data-id="${ferias.id}">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="btn btn-outline btn-sm reject-ferias" data-id="${ferias.id}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                <button class="btn btn-outline btn-sm view-ferias" data-id="${ferias.id}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        `;
+                        
+                        feriasContainer.appendChild(row);
+                    });
+                }
+                
+                // Carregar últimos registros de ponto
+                const pontosRecentes = [...database.pontos]
+                    .sort((a, b) => new Date(b.data) - new Date(a.data))
+                    .slice(0, 10);
+                
+                const pontosContainer = document.getElementById('admin-pontos-recentes');
+                pontosContainer.innerHTML = '';
+                
+                pontosRecentes.forEach(ponto => {
+                    const user = database.users.find(u => u.id === ponto.userId);
+                    const tipo = ponto.tipo === 'entrada' ? 'Entrada' : 
+                                  ponto.tipo === 'saida' ? 'Saída' : 'Intervalo';
+                    const metodo = ponto.metodo === 'geolocalizacao' ? 'Geolocalização' :
+                                   ponto.metodo === 'reconhecimento_facial' ? 'Reconhecimento Facial' :
+                                   ponto.metodo === 'reconhecimento_gestos' ? 'Reconhecimento de Gestos' :
+                                   'Manual';
+                    
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50';
+                    row.innerHTML = `
+                        <td class="py-3">${user ? user.name : 'N/A'}</td>
+                        <td class="py-3">${formatDate(ponto.data)}</td>
+                        <td class="py-3">${tipo}</td>
+                        <td class="py-3">${metodo}</td>
+                    `;
+                    
+                    pontosContainer.appendChild(row);
+                });
+                
+                // Adicionar event listeners aos botões
+                document.querySelectorAll('.approve-ferias').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const feriasId = parseInt(this.dataset.id);
+                        approveFerias(feriasId);
+                    });
+                });
+                
+                document.querySelectorAll('.reject-ferias').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const feriasId = parseInt(this.dataset.id);
+                        rejectFerias(feriasId);
+                    });
+                });
+                
+                document.querySelectorAll('.view-ferias').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const feriasId = parseInt(this.dataset.id);
+                        viewFeriasDetails(feriasId);
+                    });
+                });
+            }
+            
+            function approveFerias(id) {
+                const ferias = database.ferias.find(f => f.id === id);
+                if (!ferias) return;
+                
+                showModal(
+                    'Aprovar Solicitação de Férias',
+                    `Tem certeza que deseja aprovar a solicitação de férias de ${database.users.find(u => u.id === ferias.userId)?.name || 'este colaborador'}?`,
+                    function() {
+                        ferias.status = 'aprovado';
+                        ferias.aprovadoPor = currentUser.id;
+                        saveDatabase(database);
+                        loadAdminData();
+                        showToast('Solicitação de férias aprovada com sucesso', 'success');
+                    }
+                );
+            }
+            
+            function rejectFerias(id) {
+                const ferias = database.ferias.find(f => f.id === id);
+                if (!ferias) return;
+                
+                showModal(
+                    'Rejeitar Solicitação de Férias',
+                    `Tem certeza que deseja rejeitar a solicitação de férias de ${database.users.find(u => u.id === ferias.userId)?.name || 'este colaborador'}?`,
+                    function() {
+                        ferias.status = 'recusado';
+                        ferias.aprovadoPor = currentUser.id;
+                        saveDatabase(database);
+                        loadAdminData();
+                        showToast('Solicitação de férias rejeitada', 'warning');
+                    }
+                );
+            }
+            
+            function viewFeriasDetails(id) {
+                const ferias = database.ferias.find(f => f.id === id);
+                if (!ferias) return;
+                
+                const user = database.users.find(u => u.id === ferias.userId);
+                const inicio = new Date(ferias.inicio);
+                const fim = new Date(ferias.fim);
+                const diffTime = Math.abs(fim - inicio);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                
+                showModal(
+                    'Detalhes da Solicitação de Férias',
+                    `
+                    <div class="space-y-3">
+                        <p><strong>Colaborador:</strong> ${user ? user.name : 'N/A'}</p>
+                        <p><strong>Período:</strong> ${formatDate(ferias.inicio, false)} - ${formatDate(ferias.fim, false)} (${diffDays} dias)</p>
+                        <p><strong>Status:</strong> ${ferias.status === 'aprovado' ? 'Aprovado' : ferias.status === 'pendente' ? 'Pendente' : 'Recusado'}</p>
+                        <p><strong>Solicitado em:</strong> ${formatDate(ferias.dataSolicitacao)}</p>
+                        ${ferias.observacoes ? `<p><strong>Observações:</strong> ${ferias.observacoes}</p>` : ''}
+                    </div>
+                    `
+                );
+            }
+        }
+
+        // =============================================
+        // Invalidar Registros
+        // =============================================
+        function initInvalidarRegistros() {
+            const buscarRegistrosBtn = document.getElementById('buscar-registros-btn');
+            const registrosList = document.getElementById('registros-list');
+            const registrosTableBody = document.getElementById('registros-table-body');
+            const selectAllCheckbox = document.getElementById('select-all-registros');
+            const invalidarRegistrosBtn = document.getElementById('invalidar-registros-btn');
+
+            buscarRegistrosBtn.addEventListener('click', buscarRegistros);
+            selectAllCheckbox.addEventListener('change', toggleSelectAllRegistros);
+            invalidarRegistrosBtn.addEventListener('click', invalidarRegistrosSelecionados);
+
+            function buscarRegistros() {
+                const colaboradorId = document.getElementById('invalidar-colaborador').value;
+                const inicio = document.getElementById('invalidar-inicio').value;
+                const fim = document.getElementById('invalidar-fim').value;
+
+                if (!colaboradorId) {
+                    showToast('Selecione um colaborador', 'error');
+                    return;
+                }
+
+                if (!inicio || !fim) {
+                    showToast('Selecione um período', 'error');
+                    return;
+                }
+
+                const registros = database.pontos.filter(p => 
+                    p.userId === parseInt(colaboradorId) &&
+                    new Date(p.data) >= new Date(inicio) &&
+                    new Date(p.data) <= new Date(fim) &&
+                    !p.invalid
+                ).sort((a, b) => new Date(b.data) - new Date(a.data));
+
+                if (registros.length === 0) {
+                    registrosTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">Nenhum registro encontrado</td></tr>';
+                    registrosList.style.display = 'block';
+                    return;
+                }
+
+                registrosTableBody.innerHTML = '';
+                registros.forEach(registro => {
+                    const user = database.users.find(u => u.id === registro.userId);
+                    const tipo = registro.tipo === 'entrada' ? 'Entrada' : 
+                                  registro.tipo === 'saida' ? 'Saída' : 'Intervalo';
+                    const metodo = registro.metodo === 'geolocalizacao' ? 'Geolocalização' :
+                                   registro.metodo === 'reconhecimento_facial' ? 'Reconhecimento Facial' :
+                                   registro.metodo === 'reconhecimento_gestos' ? 'Reconhecimento de Gestos' :
+                                   'Manual';
+
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50';
+                    row.innerHTML = `
+                        <td><input type="checkbox" class="registro-checkbox" data-id="${registro.id}"></td>
+                        <td>${formatDate(registro.data)}</td>
+                        <td>${tipo}</td>
+                        <td>${metodo}</td>
+                        <td><span class="badge badge-success">Válido</span></td>
+                    `;
+                    registrosTableBody.appendChild(row);
+                });
+
+                registrosList.style.display = 'block';
+            }
+
+            function toggleSelectAllRegistros() {
+                const checkboxes = document.querySelectorAll('.registro-checkbox');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+            }
+
+            function invalidarRegistrosSelecionados() {
+                const motivo = document.getElementById('invalidar-motivo').value;
+                if (!motivo) {
+                    showToast('Informe o motivo da invalidação', 'error');
+                    return;
+                }
+
+                const checkboxes = document.querySelectorAll('.registro-checkbox:checked');
+                if (checkboxes.length === 0) {
+                    showToast('Selecione pelo menos um registro', 'error');
+                    return;
+                }
+
+                showModal(
+                    'Confirmar Invalidação',
+                    `Tem certeza que deseja invalidar ${checkboxes.length} registro(s)? Esta ação não pode ser desfeita.`,
+                    function() {
+                        checkboxes.forEach(checkbox => {
+                            const registroId = parseInt(checkbox.dataset.id);
+                            const registro = database.pontos.find(p => p.id === registroId);
+                            if (registro) {
+                                registro.invalid = true;
+                                registro.invalidReason = motivo;
+                                registro.invalidBy = currentUser.id;
+                                registro.invalidDate = new Date().toISOString();
+                            }
+                        });
+
+                        saveDatabase(database);
+                        showToast('Registros invalidados com sucesso', 'success');
+                        buscarRegistros();
+                        document.getElementById('invalidar-motivo').value = '';
+                        selectAllCheckbox.checked = false;
+
+                        // Atualizar outras seções se necessário
+                        if (currentSection === 'calendario') {
+                            initCalendario();
+                        }
+                        updateMirrorView();
+                    }
+                );
+            }
+        }
+
+        // =============================================
+        // Cadastro de Colaboradores
+        // =============================================
+        function initColaboradores() {
+            const colaboradorForm = document.getElementById('colaborador-form');
+            const employeePhoto = document.getElementById('employee-photo');
+            const employeePhotoInput = document.getElementById('employee-photo-input');
+
+            // Foto do colaborador
+            employeePhoto.addEventListener('click', () => employeePhotoInput.click());
+            employeePhotoInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        employeePhoto.src = event.target.result;
+                    };
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
+
+            // Enviar formulário
+            colaboradorForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const nome = document.getElementById('colaborador-nome').value;
+                const cpf = document.getElementById('colaborador-cpf').value;
+                const nascimento = document.getElementById('colaborador-nascimento').value;
+                const email = document.getElementById('colaborador-email').value;
+                const telefone = document.getElementById('colaborador-telefone').value;
+                const departamento = document.getElementById('colaborador-departamento').value;
+                const cargo = document.getElementById('colaborador-cargo').value;
+                const perfil = document.getElementById('colaborador-perfil').value;
+                const admissao = document.getElementById('colaborador-admissao').value;
+                const jornada = document.getElementById('colaborador-jornada').value;
+                const observacoes = document.getElementById('colaborador-observacoes').value;
+
+                if (!nome || !cpf || !email || !departamento || !cargo || !admissao) {
+                    showToast('Preencha os campos obrigatórios', 'error');
+                    return;
+                }
+
+                // Gerar e-mail e senha padrão
+                const username = nome.toLowerCase().replace(/\s+/g, '.') + '.' + cpf.substr(0, 3);
+                const emailPattern = username + '@empresa.com';
+                const senhaPadrao = 'Senha@' + cpf.substr(0, 4);
+
+                // Criar novo usuário
+                const novoColaborador = new User(
+                    database.lastId.user++,
+                    emailPattern,
+                    senhaPadrao,
+                    nome,
+                    perfil,
+                    departamento,
+                    getRandomColor()
+                );
+
+                // Preencher dados adicionais
+                novoColaborador.cpf = cpf;
+                novoColaborador.phone = telefone;
+                novoColaborador.position = cargo;
+                novoColaborador.hireDate = admissao;
+                novoColaborador.workHours = parseInt(jornada);
+                novoColaborador.birthDate = nascimento;
+
+                database.users.push(novoColaborador);
+                saveDatabase(database);
+
+                showToast('Colaborador cadastrado com sucesso!', 'success');
+                colaboradorForm.reset();
+                employeePhoto.src = 'https://via.placeholder.com/120';
+
+                // Atualizar lista de colaboradores
+                atualizarListaColaboradores();
+            });
+
+            // Função auxiliar para gerar cor aleatória
+            function getRandomColor() {
+                const colors = ['#7c4dff', '#00e5ff', '#ff4081', '#4caf50', '#ff9800', '#f44336', '#9c27b0'];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            // Atualizar lista de colaboradores
+            function atualizarListaColaboradores() {
+                const colaboradoresTable = document.getElementById('colaboradores-table');
+                colaboradoresTable.innerHTML = '';
+
+                database.users.forEach(user => {
+                    const depto = database.departamentos.find(d => d.id == user.department);
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50';
+                    row.innerHTML = `
+                        <td><img src="${employeePhoto.src}" alt="Foto" class="rounded-full" style="width: 40px; height: 40px;"></td>
+                        <td>${user.name}</td>
+                        <td>${user.cpf || 'N/A'}</td>
+                        <td>${depto ? depto.nome : 'N/A'}</td>
+                        <td>${user.position || 'N/A'}</td>
+                        <td><span class="badge ${user.status === 'ativo' ? 'badge-success' : 'badge-error'}">${user.status === 'ativo' ? 'Ativo' : 'Inativo'}</span></td>
+                        <td>
+                            <button class="btn btn-outline btn-sm edit-colaborador" data-id="${user.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-outline btn-sm delete-colaborador" data-id="${user.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    colaboradoresTable.appendChild(row);
+                });
+
+                // Adicionar event listeners aos botões
+                document.querySelectorAll('.edit-colaborador').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const userId = parseInt(this.dataset.id);
+                        editarColaborador(userId);
+                    });
+                });
+
+                document.querySelectorAll('.delete-colaborador').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const userId = parseInt(this.dataset.id);
+                        deletarColaborador(userId);
+                    });
+                });
+            }
+
+            function editarColaborador(id) {
+                const colaborador = database.users.find(u => u.id === id);
+                if (!colaborador) return;
+
+                // Preencher formulário com dados do colaborador
+                document.getElementById('colaborador-nome').value = colaborador.name;
+                document.getElementById('colaborador-cpf').value = colaborador.cpf;
+                document.getElementById('colaborador-nascimento').value = colaborador.birthDate || '';
+                document.getElementById('colaborador-email').value = colaborador.email;
+                document.getElementById('colaborador-telefone').value = colaborador.phone || '';
+                document.getElementById('colaborador-departamento').value = colaborador.department;
+                document.getElementById('colaborador-cargo').value = colaborador.position || '';
+                document.getElementById('colaborador-perfil').value = colaborador.role;
+                document.getElementById('colaborador-admissao').value = colaborador.hireDate.split('T')[0];
+                document.getElementById('colaborador-jornada').value = colaborador.workHours;
+                document.getElementById('colaborador-observacoes').value = '';
+
+                // Rolar para o topo do formulário
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                showToast('Preencha o formulário para editar o colaborador', 'info');
+            }
+
+            function deletarColaborador(id) {
+                showModal(
+                    'Confirmar Exclusão',
+                    'Tem certeza que deseja excluir este colaborador?',
+                    function() {
+                        database.users = database.users.filter(u => u.id !== id);
+                        saveDatabase(database);
+                        atualizarListaColaboradores();
+                        showToast('Colaborador excluído com sucesso', 'success');
+                    }
+                );
+            }
+
+            // Carregar lista inicial
+            atualizarListaColaboradores();
+        }
+        
+        // =============================================
+        // Inicialização da Aplicação
+        // =============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Carregar banco de dados
+            database = loadDatabase();
+            
+            // Verificar se há um usuário logado (simulação)
+            const loggedInUser = database.users[0]; // Simular login do admin
+            currentUser = loggedInUser;
+            currentToken = generateToken(loggedInUser);
+            
+            // Atualizar perfil do usuário
+            updateUserProfile(loggedInUser);
+            
+            // Configurar navegação
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showSection(this.dataset.section);
+                });
+            });
+            
+            // Configurar modal
+            modalClose.addEventListener('click', hideModal);
+            modalCancel.addEventListener('click', hideModal);
+            
+            // Mostrar seção inicial
+            showSection('dashboard');
+            
+            // Atualizar espelho de ponto
+            updateMirrorView();
+
+            // Simular notificação de boas-vindas
+            setTimeout(() => {
+                showToast(`Bem-vindo(a), ${loggedInUser.name}!`, 'info');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
