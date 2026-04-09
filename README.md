@@ -1,93 +1,173 @@
-# Sistema de Ponto Eletrônico
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitProfile: Personal Fitness Journey Planner</title>
+    <meta name="description" content="Track your fitness goals, dietary preferences, and training progress with customized user profiles">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3.5.13/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div id="app" class="min-h-screen">
+        <header class="bg-blue-600 text-white py-6 shadow-lg">
+            <div class="container mx-auto px-4">
+                <h1 class="text-3xl font-bold">FitProfile</h1>
+                <p class="mt-2">Seu planejador pessoal de jornada de condicionamento físico</p>
+            </div>
+        </header>
 
-Sistema de ponto eletrônico simples desenvolvido em HTML, Tailwind CSS e JavaScript. Permite que colaboradores registrem entrada, início e fim do intervalo de almoço, e saída do trabalho, com controle visual e histórico dos registros.
+        <main class="container mx-auto px-4 py-8">
+            <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-semibold mb-6">Crie seu perfil</h2>
+                
+                <form @submit.prevent="submitForm" class="space-y-6">
+                    <!-- Personal Information -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Nome</label>
+                            <input v-model="profile.name" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
 
----
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Idade</label>
+                                <input v-model="profile.age" type="number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Altura (cm)</label>
+                                <input v-model="profile.height" type="number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Peso (kg)</label>
+                                <input v-model="profile.weight" type="number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
 
-## Funcionalidades
+                    <!-- Fitness Goals -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Objetivo</label>
+                        <select v-model="profile.goal" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="emagrecer">Emagrecer</option>
+                            <option value="massa">Ganhar Massa</option>
+                            <option value="manter">Manter</option>
+                        </select>
+                    </div>
 
-- Login com usuário e senha (mockados em um banco de dados local para fins de demonstração)
-- Registro de ponto com etapas:  
-  - Entrada  
-  - Início do intervalo  
-  - Fim do intervalo  
-  - Saída  
-- Visualização dos horários registrados no dia atual
-- Cálculo automático das horas trabalhadas, duração do intervalo e horas restantes do dia
-- Histórico dos últimos 5 registros do usuário
-- Mensagens de confirmação e erros através de toast notifications
-- Logout do sistema
-- Atualização de horário em tempo real com saudação dinâmica (bom dia, boa tarde, boa noite)
-- Interface responsiva e com design moderno usando Tailwind CSS
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nível de Experiência</label>
+                        <select v-model="profile.experience" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="iniciante">Iniciante</option>
+                            <option value="intermediario">Intermediário</option>
+                            <option value="avancado">Avançado</option>
+                        </select>
+                    </div>
 
----
-![image](https://github.com/user-attachments/assets/7f04ad87-d76b-4c61-8ff6-5c2df50f8171)
-![image](https://github.com/user-attachments/assets/81cca01d-96ae-4499-924e-71b6f0dbcf71)
-Login do Usuario
-![image](https://github.com/user-attachments/assets/577d85c8-5356-4e12-b285-8ba1183b0684)
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Frequência de Treino (dias por semana)</label>
+                        <input v-model="profile.frequency" type="number" min="1" max="7" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
 
+                    <!-- Dietary Preferences -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Preferências Alimentares</label>
+                        <div class="mt-2 space-y-2">
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" v-model="profile.dietaryPreferences" value="vegetariano" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <span class="ml-2">Vegetariano</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" v-model="profile.dietaryPreferences" value="vegano" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <span class="ml-2">Vegano</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" v-model="profile.dietaryPreferences" value="sem_lactose" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <span class="ml-2">Sem Lactose</span>
+                            </label>
+                        </div>
+                    </div>
 
-## Tecnologias Utilizadas
+                    <!-- Goals -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Meta de Peso/Gordura Corporal</label>
+                            <input v-model="profile.weightGoal" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
 
-- HTML5
-- Tailwind CSS
-- JavaScript (ES6+)
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Meta de Performance</label>
+                            <input v-model="profile.performanceGoal" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ex: Correr 5km em 30min">
+                        </div>
 
----
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Prazo para Atingir (meses)</label>
+                            <input v-model="profile.deadline" type="number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                    </div>
 
-## Como Usar
+                    <div class="flex items-center justify-end space-x-4">
+                        <button type="button" @click="resetForm" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Limpar
+                        </button>
+                        <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Salvar Perfil
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
 
-1. Clone este repositório:
-   ```bash
-   git clone https://github.com/seu-usuario/sistema-ponto-eletronico.git
-Abra o arquivo index.html em seu navegador preferido.
+    <script type="module">
+        const { createApp, ref } = Vue;
 
-Faça login com um dos usuários mockados no arquivo script.js:
+        createApp({
+            setup() {
+                const profile = ref({
+                    name: '',
+                    age: null,
+                    height: null,
+                    weight: null,
+                    goal: '',
+                    experience: '',
+                    frequency: null,
+                    dietaryPreferences: [],
+                    weightGoal: '',
+                    performanceGoal: '',
+                    deadline: null
+                });
 
-Usuário	Email	Senha	Papel
-João Silva	joao@empresa.com	123456	Colaborador
-Maria Souza	maria@empresa.com	123456	Gerente
-Admin	admin@empresa.com	123456	Administrador
+                const submitForm = () => {
+                    console.log('Profile data:', profile.value);
+                    // Add API call or storage logic here
+                    alert('Perfil salvo com sucesso!');
+                };
 
-Após o login, utilize o botão principal para registrar os horários do dia conforme as etapas.
+                const resetForm = () => {
+                    profile.value = {
+                        name: '',
+                        age: null,
+                        height: null,
+                        weight: null,
+                        goal: '',
+                        experience: '',
+                        frequency: null,
+                        dietaryPreferences: [],
+                        weightGoal: '',
+                        performanceGoal: '',
+                        deadline: null
+                    };
+                };
 
-Veja seu histórico de registros recentes e acompanhe o resumo do seu dia de trabalho.
-
-Estrutura do Projeto
-index.html — Estrutura principal do sistema
-
-style.css — Estilos customizados (separado do Tailwind)
-
-script.js — Lógica do sistema, manipulação do DOM e controle de ponto
-
-assets/ — Imagens e ícones (caso existam)
-
-Próximos Passos / Melhorias Futuras
-Integração com backend real e banco de dados
-
-Cadastro de novos usuários e recuperação de senha
-
-Exportação de relatórios em PDF ou Excel
-
-Notificações de lembrete para bater ponto
-
-Controle de diferentes jornadas de trabalho por usuário
-
-Autenticação segura (hash de senha, tokens JWT)
-
-Autor
-Matheus freitas
-
-Licença
-Este projeto está sob a licença MIT. Veja o arquivo LICENSE para detalhes.
-
-=
-
-Quer que eu adapte para o seu nome de usuário do GitHub e outros detalhes?
-
-
-
-
-
-
-
+                return {
+                    profile,
+                    submitForm,
+                    resetForm
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
