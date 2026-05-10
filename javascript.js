@@ -6,7 +6,7 @@
         name: "João Silva",  
         email: "joao@empresa.com",  
         password: "123456",  
-        role: "Colaborador",
+        role: "Colaborador", 
         department: "TI",
         avatar: "JS"
       },
