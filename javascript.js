@@ -2,7 +2,7 @@
     // Mock database - In a real app, this would be API calls to your backend
     const mockUsers = [
       { 
-        id: 1, 
+        id: 1,    
         name: "João Silva",  
         email: "joao@empresa.com",  
         password: "123456",  
