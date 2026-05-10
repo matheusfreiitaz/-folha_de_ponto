@@ -4,7 +4,7 @@
       { 
         id: 1, 
         name: "João Silva",  
-        email: "joao@empresa.com", 
+        email: "joao@empresa.com",  
         password: "123456",  
         role: "Colaborador",
         department: "TI",
