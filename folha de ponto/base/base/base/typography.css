@@ -1,0 +1,10 @@
+body {
+    background-color: var(--background);
+    color: var(--text);
+    min-height: 100vh;
+}
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+}
