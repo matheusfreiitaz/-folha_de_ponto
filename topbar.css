@@ -1,0 +1,87 @@
+/* ============================================================
+   helpers.js — Utilitários Gerais · Nova Telecom
+   ============================================================ */
+
+/* ── Toast ── */
+let toastContainer = null;
+
+function getToastContainer() {
+  if (!toastContainer) {
+    toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) {
+      toastContainer = document.createElement('div');
+      toastContainer.className = 'toast-container';
+      document.body.appendChild(toastContainer);
+    }
+  }
+  return toastContainer;
+}
+
+/**
+ * Exibe uma notificação toast.
+ * @param {string} message
+ * @param {'success'|'error'|'warning'|'info'} type
+ * @param {number} duration — ms
+ */
+export function showToast(message, type = 'info', duration = 3500) {
+  const icons = { success: 'check-circle', error: 'times-circle', warning: 'exclamation-triangle', info: 'info-circle' };
+
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `<i class="fas fa-${icons[type]}"></i> ${message}`;
+
+  getToastContainer().appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+
+  setTimeout(() => {
+    toast.classList.remove('show');
+    toast.addEventListener('transitionend', () => toast.remove());
+  }, duration);
+}
+
+/* ── Formatação de datas ── */
+
+/**
+ * Retorna a data no formato YYYY-MM-DD (padrão input[type=date]).
+ * @param {Date} date
+ */
+export function formatDate(date = new Date()) {
+  return date.toISOString().split('T')[0];
+}
+
+/**
+ * Formata uma data para exibição no padrão DD/MM/YYYY.
+ * @param {string|Date} date
+ */
+export function formatDateBR(date) {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toLocaleDateString('pt-BR');
+}
+
+/**
+ * Formata um número de segundos em HH:MM.
+ * @param {number} seconds
+ */
+export function formatDuration(seconds) {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+/* ── Debounce ── */
+export function debounce(fn, delay = 300) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+}
+
+/* ── Storage seguro ── */
+const PREFIX = 'nova_telecom_';
+
+export const storage = {
+  get(key)         { try { return JSON.parse(localStorage.getItem(PREFIX + key)); } catch { return null; } },
+  set(key, value)  { localStorage.setItem(PREFIX + key, JSON.stringify(value)); },
+  remove(key)      { localStorage.removeItem(PREFIX + key); },
+};

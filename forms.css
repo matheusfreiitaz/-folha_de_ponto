@@ -1,0 +1,40 @@
+/* ============================================================
+   documentos.js — Módulo Documentos · Nova Telecom
+   Upload, listagem e gestão de documentos do colaborador
+   ============================================================ */
+
+import { showToast } from '../utils/helpers.js';
+
+const DOCUMENTOS_MOCK = [
+  { id: 1, nome: 'Atestado Médico - Maio 2025.pdf', tipo: 'Atestado',    tamanho: '245 KB', status: 'Aprovado',  data: '10/05/2025' },
+  { id: 2, nome: 'Comprovante Endereço.pdf',          tipo: 'Comprovante', tamanho: '1.2 MB', status: 'Pendente',  data: '08/05/2025' },
+  { id: 3, nome: 'Holerite Abril 2025.pdf',           tipo: 'Holerite',    tamanho: '180 KB', status: 'Aprovado',  data: '01/05/2025' },
+];
+
+export function initDocumentos() {
+  renderizarDocumentos(DOCUMENTOS_MOCK);
+
+  document.getElementById('novo-documento-btn')?.addEventListener('click', () => {
+    showToast('Funcionalidade de upload disponível em breve.', 'info');
+  });
+}
+
+function renderizarDocumentos(docs) {
+  const container = document.getElementById('documentos-list');
+  if (!container) return;
+
+  container.innerHTML = docs.map(doc => `
+    <div class="doc-item">
+      <div class="doc-icon"><i class="fas fa-file-pdf"></i></div>
+      <div class="doc-info">
+        <div class="doc-name">${doc.nome}</div>
+        <div class="doc-meta">${doc.tipo} · ${doc.tamanho} · ${doc.data}</div>
+      </div>
+      <span class="badge ${doc.status === 'Aprovado' ? 'badge-success' : 'badge-warning'}">${doc.status}</span>
+      <div class="doc-actions">
+        <button class="btn btn-outline btn-sm" title="Visualizar"><i class="fas fa-eye"></i></button>
+        <button class="btn btn-outline btn-sm" title="Baixar"><i class="fas fa-download"></i></button>
+        <button class="btn btn-outline btn-sm" title="Excluir" onclick="this.closest('.doc-item').remove()"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>`).join('');
+}

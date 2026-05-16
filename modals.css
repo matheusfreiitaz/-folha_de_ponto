@@ -1,0 +1,102 @@
+/* ============================================================
+   app.js — Controlador Principal · Nova Telecom
+   Inicializa a aplicação e gerencia o roteamento entre seções
+   ============================================================ */
+
+import AppConfig from '../../config/app.config.js';
+
+/* ── Estado global da sessão ── */
+const AppState = {
+  currentSection: 'dashboard',
+  currentUser: {
+    name: 'John Doe',
+    initials: 'JD',
+    role: 'Administrador',
+    isAdmin: true,
+  },
+};
+
+/* ── Mapeamento seção → título ── */
+const SECTION_TITLES = {
+  dashboard:  'Dashboard',
+  registrar:  'Registrar Ponto',
+  calendario: 'Calendário',
+  ferias:     'Férias',
+  relatorios: 'Relatórios',
+  documentos: 'Documentos',
+  aprovar:    'Aprovações',
+  admin:      'Administração',
+  equipe:     'Minha Equipe',
+};
+
+/* ── Mostra uma seção e esconde as demais ── */
+export function showSection(name) {
+  document.querySelectorAll('.section-content').forEach(el => {
+    el.style.display = 'none';
+  });
+
+  const target = document.getElementById(`${name}-section`);
+  if (target) target.style.display = '';
+
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.section === name);
+  });
+
+  document.querySelectorAll('.bnav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.section === name);
+  });
+
+  const titleEl = document.getElementById('page-title');
+  if (titleEl) titleEl.textContent = SECTION_TITLES[name] ?? name;
+
+  AppState.currentSection = name;
+
+  // Fecha sidebar no mobile
+  document.getElementById('sidebar')?.classList.remove('open');
+  document.getElementById('sidebar-overlay')?.classList.remove('active');
+}
+
+/* ── Inicialização ── */
+function init() {
+  // Preenche dados do usuário na sidebar
+  const avatar = document.getElementById('sidebar-avatar');
+  const userName = document.getElementById('sidebar-name');
+  const userRole = document.getElementById('sidebar-role');
+
+  if (avatar)   avatar.textContent   = AppState.currentUser.initials;
+  if (userName) userName.textContent = AppState.currentUser.name;
+  if (userRole) userRole.textContent = AppState.currentUser.role;
+
+  // Admin-only items
+  if (AppState.currentUser.isAdmin) {
+    document.querySelectorAll('.admin-only').forEach(el => {
+      el.style.display = '';
+    });
+  }
+
+  // Nav clicks
+  document.querySelectorAll('[data-section]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      showSection(el.dataset.section);
+    });
+  });
+
+  // Hamburger
+  document.getElementById('hamburger-btn')?.addEventListener('click', () => {
+    document.getElementById('sidebar')?.classList.toggle('open');
+    document.getElementById('sidebar-overlay')?.classList.toggle('active');
+  });
+
+  document.getElementById('sidebar-overlay')?.addEventListener('click', () => {
+    document.getElementById('sidebar')?.classList.remove('open');
+    document.getElementById('sidebar-overlay')?.classList.remove('active');
+  });
+
+  // Mostra seção inicial
+  showSection('dashboard');
+
+  console.log(`%c Nova Telecom | Folha de Ponto v${AppConfig.app.version} `, 'background:#5b21f3;color:#fff;padding:4px 8px;border-radius:4px;');
+}
+
+document.addEventListener('DOMContentLoaded', init);

@@ -1,0 +1,30 @@
+/* ============================================================
+   geolocation.js — Wrapper Geolocation API · Nova Telecom
+   ============================================================ */
+
+import AppConfig from '../../config/app.config.js';
+
+/**
+ * Obtém a posição atual do usuário.
+ * @returns {Promise<{latitude, longitude, address}>}
+ */
+export function getCurrentLocation() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocalização não suportada neste navegador.'));
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        resolve({
+          latitude:  coords.latitude,
+          longitude: coords.longitude,
+          address:   null, // Pode integrar com API de geocoding
+        });
+      },
+      err => reject(err),
+      AppConfig.geolocation,
+    );
+  });
+}
